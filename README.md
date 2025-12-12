@@ -4,36 +4,48 @@ WordPress plugin pre správu developerských projektov s interaktívnymi mapami 
 
 ## Požiadavky
 
-- WordPress 5.0+
-- PHP 7.4+
-- Moderný prehliadač s podporou ES6+
+- WordPress 6.0+
+- PHP 8.0+
+- Moderný prehliadač s podporou ES Modules
 
 ## Inštalácia
 
 1. Nahrať priečinok pluginu do `/wp-content/plugins/`
 2. Aktivovať plugin v WordPress admin paneli
-3. Plugin automaticky vytvorí potrebné databázové štruktúry
+3. Nastavenia → Developer Map
 
-## Použitie
+## Shortcode
 
-Po aktivácii je plugin dostupný v admin menu. Pri prvom spustení sa automaticky vytvoria predvolené nastavenia:
-- 3 typy lokalít (Bytovka, Poschodie, Byt)
-- 3 stavy (Voľný, Rezervovaný, Predaný)
-- 3 farebné schémy pre UI
-- Predvolený font (Inter)
+```
+[dm_map map_key="nazov-mapy"]
+```
 
 ## Funkcie
 
-- Správa viacerých projektov
-- Interaktívne SVG/GeoJSON mapy
+- Správa viacerých projektov a lokalít
+- Interaktívne SVG mapy s kreslením zón
 - Vlastné typy lokalít a stavy
-- Nastaviteľné farby a fonty
+- Nastaviteľné farby, fonty a témy
 - REST API pre frontend zobrazenie
-- Automatická synchronizácia dát
+
+## Štruktúra
+
+```
+developer-map-v2/
+├── developer-map.php
+├── includes/
+│   ├── api/          # REST API
+│   └── core/         # Storage
+└── assets/
+    ├── css/
+    ├── js/admin/     # Admin dashboard
+    ├── js/frontend/  # Map viewer
+    └── images/icons/
+```
 
 ## Verzia
 
-**0.3.6** - Aktuálna stabilná verzia
+**0.5.0** - Aktuálna verzia s vylepšenou architektúrou
 
 ## Autor
 

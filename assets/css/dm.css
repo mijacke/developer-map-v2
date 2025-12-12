@@ -1,9 +1,5 @@
-/* Developer Map - Compiled CSS */
-/* Generated: 2025-10-31 08:58:33 */
-/* Version: 0.2.1 */
-
 /* === base.css === */
-#dm-root.dm-root {
+:root {
     --dm-bg: #f3f3f7;
     --dm-surface: #ffffff;
     --dm-border: #d9d9de;
@@ -27,7 +23,13 @@
     --dm-map-modal-heading-color: #1C134F;
     --dm-map-modal-content-color: #1C134F;
     --dm-toolbar-text-color: #1C134F;
+}
 
+[hidden] {
+    display: none !important;
+}
+
+#dm-root.dm-root {
     position: relative;
     display: flex;
     justify-content: flex-start;
@@ -42,6 +44,10 @@
 
 #dm-root.dm-root * {
     box-sizing: border-box;
+}
+
+#dm-root.dm-root [hidden] {
+    display: none !important;
 }
 
 #dm-root.dm-root button,
@@ -2049,7 +2055,7 @@
 
 .dm-dashboard__back:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--dm-button-color, #7c3aed) 25%, transparent);
 }
 
 .dm-dashboard__heading h1 {
@@ -2237,7 +2243,7 @@
     font-size: clamp(12px, 1.4vw, 13px);
     font-weight: 600;
     color: rgba(45, 45, 78, 0.85);
-    background: rgba(124, 58, 237, 0.08);
+    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 8%, transparent);
     transition: opacity 0.18s ease;
     white-space: nowrap;
 }
@@ -2445,7 +2451,7 @@
     font-weight: 600;
     padding: 6px 14px;
     border-radius: 999px;
-    background: rgba(124, 58, 237, 0.08);
+    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 8%, transparent);
     color: rgba(45, 45, 78, 0.85);
 }
 
@@ -2466,7 +2472,7 @@
 }
 
 .dm-status--unknown {
-    background: rgba(124, 58, 237, 0.12);
+    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 12%, transparent);
     color: rgba(45, 45, 78, 0.65);
 }
 
@@ -2488,8 +2494,8 @@
     margin: 0 auto;
     padding: 48px 40px;
     border-radius: 24px;
-    border: 1px dashed rgba(124, 58, 237, 0.28);
-    background: linear-gradient(155deg, rgba(124, 58, 237, 0.1), rgba(124, 58, 237, 0.04));
+    border: 1px dashed color-mix(in srgb, var(--dm-button-color, #7c3aed) 28%, transparent);
+    background: linear-gradient(155deg, color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent), color-mix(in srgb, var(--dm-button-color, #7c3aed) 4%, transparent));
     box-shadow: 0 22px 40px rgba(36, 24, 76, 0.12);
 }
 
@@ -2807,6 +2813,10 @@
 
     /* Smooth transitions pri fold/unfold menu a zmenách scrollbaru */
     transition: left 0.3s ease, width 0.3s ease, right 0.3s ease, top 0.2s ease, height 0.2s ease;
+}
+
+.dm-modal-overlay[hidden] {
+    display: none !important;
 }
 
 /* Fallback pre non-admin kontext (front-end) */
@@ -4078,13 +4088,13 @@ body:not(.wp-admin) .dm-modal-overlay {
     padding: 10px;
     border-radius: 10px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 250, 255, 0.96) 100%);
-    border: 1px solid rgba(124, 58, 237, 0.12);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+    border: 1px solid color-mix(in srgb, var(--dm-button-color, #7c3aed) 12%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--dm-button-color, #7c3aed) 8%, transparent);
 }
 
 .dm-draw__aside-header {
     padding-bottom: 8px;
-    border-bottom: 1.5px solid rgba(124, 58, 237, 0.1);
+    border-bottom: 1.5px solid color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent);
 }
 
 .dm-draw__aside-header h3 {
@@ -4108,9 +4118,8 @@ body:not(.wp-admin) .dm-modal-overlay {
 }
 
 .dm-draw__add-region:hover {
-    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 85%, black);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+    box-shadow: none;
 }
 
 .dm-draw__regions {
@@ -4155,16 +4164,16 @@ body:not(.wp-admin) .dm-modal-overlay {
 
 .dm-draw__region-button:hover:not(:disabled),
 .dm-draw__region-button:focus-visible:not(:disabled) {
-    border-color: rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.04);
+    border-color: color-mix(in srgb, var(--dm-button-color, #7c3aed) 30%, transparent);
+    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 4%, transparent);
     transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent);
 }
 
 .dm-draw__region-item.is-active .dm-draw__region-button {
     border-color: var(--dm-button-color, #7c3aed);
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(124, 58, 237, 0.16) 100%);
-    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.15);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent) 0%, color-mix(in srgb, var(--dm-button-color, #7c3aed) 16%, transparent) 100%);
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--dm-button-color, #7c3aed) 15%, transparent);
     transform: translateX(4px);
     pointer-events: auto;
     opacity: 1;
@@ -4180,7 +4189,7 @@ body:not(.wp-admin) .dm-modal-overlay {
     border-radius: 8px;
     display: block;
     width: 100%;
-    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--dm-button-color, #7c3aed) 20%, transparent);
 }
 
 .dm-draw__region-connection {
@@ -4198,8 +4207,8 @@ body:not(.wp-admin) .dm-modal-overlay {
     padding: 10px;
     border-radius: 10px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 250, 255, 0.96) 100%);
-    border: 1px solid rgba(124, 58, 237, 0.12);
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+    border: 1px solid color-mix(in srgb, var(--dm-button-color, #7c3aed) 12%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--dm-button-color, #7c3aed) 8%, transparent);
 }
 
 .dm-draw__region-form-header {
@@ -4209,7 +4218,7 @@ body:not(.wp-admin) .dm-modal-overlay {
     gap: 8px;
     padding-bottom: 8px;
     margin-bottom: 8px;
-    border-bottom: 1.5px solid rgba(124, 58, 237, 0.1);
+    border-bottom: 1.5px solid color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent);
 }
 
 .dm-draw__region-form-header h3 {
@@ -4315,7 +4324,7 @@ body:not(.wp-admin) .dm-modal-overlay {
     min-width: 22px;
     padding: 2px 8px;
     border-radius: 999px;
-    background: rgba(124, 58, 237, 0.1);
+    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent);
     color: var(--dm-button-color, #7c3aed);
     font-weight: 600;
 }
@@ -4578,7 +4587,7 @@ body:not(.wp-admin) .dm-modal-overlay {
     height: 44px;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(12, 18, 36, 0.82);
+    background: var(--dm-button-color, #7c3aed);
     color: #f5f7ff;
     display: inline-flex;
     align-items: center;
@@ -4593,20 +4602,21 @@ body:not(.wp-admin) .dm-modal-overlay {
     display: inline-flex;
 }
 
-.dm-draw__fullscreen-toggle svg {
+.dm-draw__fullscreen-toggle svg,
+.dm-draw__fullscreen-toggle img {
     width: 22px;
     height: 22px;
 }
 
 .dm-draw__fullscreen-toggle:is(:hover, :focus-visible) {
-    background: rgba(64, 92, 255, 0.92);
-    border-color: rgba(255, 255, 255, 0.35);
+    background: var(--dm-button-color, #7c3aed);
     outline: none;
     transform: translateY(-1px);
+    box-shadow: none;
 }
 
 .dm-draw--fullscreen .dm-draw__fullscreen-toggle {
-    background: rgba(20, 25, 46, 0.94);
+    background: var(--dm-button-color, #7c3aed);
 }
 
 body.dm-draw-fullscreen-active {
@@ -4650,6 +4660,7 @@ body.dm-draw-fullscreen-active {
     right: 32px;
     bottom: 32px;
     z-index: 1003;
+    background: var(--dm-button-color, #7c3aed);
 }
 
 .dm-draw__stage--fullscreen .dm-draw__levels {
@@ -5230,6 +5241,8 @@ body:not(.wp-admin) .dm-editor-overlay {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    position: relative;
+    z-index: 1005;
 }
 
 .dm-editor__panel-header h2,
@@ -5442,7 +5455,7 @@ body:not(.wp-admin) .dm-editor-overlay {
     border-color: var(--dm-button-color, #7c3aed);
     background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 5%, var(--dm-surface));
     transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, transparent);
 }
 
 .dm-editor__zone-item--active .dm-editor__zone-button {
@@ -5450,7 +5463,7 @@ body:not(.wp-admin) .dm-editor-overlay {
     background: linear-gradient(135deg,
             color-mix(in srgb, var(--dm-button-color, #7c3aed) 10%, var(--dm-surface)) 0%,
             color-mix(in srgb, var(--dm-button-color, #7c3aed) 15%, var(--dm-surface)) 100%);
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--dm-button-color, #7c3aed) 20%, transparent);
     transform: translateX(4px);
 }
 
@@ -5485,9 +5498,16 @@ body:not(.wp-admin) .dm-editor-overlay {
 }
 
 .dm-editor__add-zone:hover {
-    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 90%, black);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    box-shadow: none;
+    background: var(--dm-button-color, #7c3aed);
+}
+
+.dm-editor__add-zone svg,
+.dm-editor__add-zone img {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 /* CENTER PANEL: Canvas/Viewport */
@@ -5589,20 +5609,21 @@ body:not(.wp-admin) .dm-editor-overlay {
     font-size: 13px;
     font-weight: 600;
     border-radius: 8px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    background: rgba(254, 242, 242, 0.8);
-    color: #ef4444;
+    border: none;
+    background: var(--dm-button-color, #7c3aed);
+    color: white !important;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .dm-editor__remove-zone:hover:not([disabled]) {
-    background: #ef4444;
-    border-color: #ef4444;
-    color: white;
+    background: var(--dm-button-color, #7c3aed);
+    color: white !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    box-shadow: none;
+    opacity: 1;
 }
+
 
 .dm-editor__remove-zone[disabled] {
     opacity: 0.4;
@@ -5948,6 +5969,8 @@ body:not(.wp-admin) .dm-editor-overlay {
     border-top: 2px solid var(--dm-border);
     flex-shrink: 0;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+    position: relative;
+    z-index: 1005;
 }
 
 .dm-editor__footer .dm-button {
@@ -5975,16 +5998,42 @@ body:not(.wp-admin) .dm-editor-overlay {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.dm-editor__footer .dm-button--primary {
+/* Global Primary Button Styles */
+.dm-button--primary {
     border: none;
     background: var(--dm-button-color, #7c3aed);
-    color: white;
+    color: white !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.dm-editor__footer .dm-button--primary:hover {
-    background: color-mix(in srgb, var(--dm-button-color, #7c3aed) 90%, black);
+.dm-button--primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+    box-shadow: none;
+    background: var(--dm-button-color, #7c3aed);
+}
+
+.dm-button--primary svg,
+.dm-button--primary img {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Ensure primary buttons and add-zone have proper icon sizing */
+.dm-button--primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white !important;
+}
+
+.dm-button--primary svg,
+.dm-button--primary img {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 /* RESPONSIVE BREAKPOINTS */
@@ -6131,215 +6180,6 @@ body:not(.wp-admin) .dm-editor-overlay {
 
     .dm-editor__footer {
         padding: 16px 20px;
-    }
-}
-
-/* Guides view */
-.dm-guides__header {
-    align-items: stretch;
-}
-
-.dm-guides__intro {
-    flex: 1 1 420px;
-    max-width: 720px;
-}
-
-.dm-guides__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 12px;
-    border-radius: 999px;
-    background: rgba(76, 56, 255, 0.1);
-    color: var(--dm-action);
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin: 0 0 12px;
-}
-
-.dm-guides__intro h1 {
-    margin-top: 0;
-}
-
-.dm-guides__intro p {
-    color: var(--dm-text-muted);
-    margin-top: 12px;
-}
-
-.dm-guides__stats {
-    flex: 1 1 320px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-}
-
-.dm-guides__stat {
-    padding: 18px;
-    border-radius: 20px;
-    border: 1px solid rgba(22, 22, 29, 0.08);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 30px rgba(22, 22, 29, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.dm-guides__stat span {
-    font-size: 13px;
-    color: var(--dm-text-muted);
-}
-
-.dm-guides__stat strong {
-    font-size: clamp(24px, 3vw, 32px);
-    font-weight: 700;
-    color: var(--dm-heading-color, #1C134F);
-}
-
-.dm-guides__content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: clamp(18px, 2vw, 24px);
-}
-
-.dm-guides__card {
-    background: var(--dm-surface);
-    border-radius: 28px;
-    border: 1px solid rgba(22, 22, 29, 0.08);
-    padding: clamp(20px, 2.4vw, 28px);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    box-shadow: 0 18px 48px rgba(22, 22, 29, 0.08);
-}
-
-.dm-guides__card h2 {
-    margin: 0;
-    font-size: 20px;
-}
-
-.dm-guides__card h3 {
-    margin: 0 0 6px;
-    font-size: 16px;
-}
-
-.dm-guides__card ul,
-.dm-guides__card ol {
-    margin: 0;
-    padding-left: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: var(--dm-text-muted);
-}
-
-.dm-guides__card code {
-    font-size: 14px;
-    background: rgba(76, 56, 255, 0.08);
-    padding: 2px 6px;
-    border-radius: 8px;
-}
-
-.dm-guides__card--workflow,
-.dm-guides__card--support {
-    grid-column: span 2;
-}
-
-.dm-guides__note {
-    padding: 12px 16px;
-    border-radius: 16px;
-    background: rgba(76, 56, 255, 0.08);
-    color: var(--dm-action);
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.dm-guides__steps {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.dm-guides__step {
-    display: flex;
-    gap: 16px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid rgba(22, 22, 29, 0.08);
-}
-
-.dm-guides__step:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.dm-guides__step-index {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    background: var(--dm-action);
-    color: white;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.dm-guides__subgrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-}
-
-.dm-guides__pill-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-}
-
-.dm-guides__pill {
-    border: 1px solid rgba(22, 22, 29, 0.08);
-    border-radius: 18px;
-    padding: 16px;
-    background: rgba(247, 247, 251, 0.9);
-}
-
-.dm-guides__pill strong {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--dm-heading-color, #1C134F);
-}
-
-.dm-guides__checks {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
-}
-
-.dm-guides__checks h3 {
-    margin-top: 0;
-}
-
-.dm-guides__checks ul {
-    padding-left: 18px;
-}
-
-@media (max-width: 1024px) {
-
-    .dm-guides__card--workflow,
-    .dm-guides__card--support {
-        grid-column: span 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .dm-guides__stats {
-        grid-template-columns: repeat(2, minmax(140px, 1fr));
-    }
-
-    .dm-guides__content {
-        grid-template-columns: 1fr;
     }
 }
 

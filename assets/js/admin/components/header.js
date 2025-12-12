@@ -1,26 +1,43 @@
-import { APP_VIEWS } from '../constants.js';
-import { escapeHtml } from '../utils/html.js';
+const getModuleVersion = () => {
+    try {
+        const url = new URL(import.meta.url);
+        const fromUrl = url.searchParams.get('ver');
+        if (fromUrl) {
+            return fromUrl;
+        }
+    } catch (error) {
+        // ignore
+    }
+
+    return (typeof window !== 'undefined' && window.dmRuntimeConfig?.ver) || Date.now();
+};
+
+const ver = encodeURIComponent(String(getModuleVersion()));
+
+const [{ APP_VIEWS }, { escapeHtml }] = await Promise.all([
+    import(`../constants.js?ver=${ver}`),
+    import(`../utils/html.js?ver=${ver}`),
+]);
 
 // Plugin version - should match PHP version
-const PLUGIN_VERSION = '0.4.4';
+const PLUGIN_VERSION = '0.5.0';
 
 const getBrandIcons = (base) => ({
-    logo: `<img src="${base}/img/Logo.svg" alt="Logo" style="display: block; width: auto; height: clamp(32px, 5vw, 48px);" />`,
-    mark: `<img src="${base}/img/Brand_logo.svg" alt="FuuDobre" style="display: block; width: 100%; height: auto;" />`
+    logo: `<img src="${base}/../../images/Logo.svg" alt="Logo" style="display: block; width: auto; height: clamp(32px, 5vw, 48px);" />`,
+    mark: ``
 });
 
 
 const getNavIcons = (base) => ({
-    settings: `<img src="${base}/img/Settings_btn.svg" width="24" height="24" alt="Settings" />`,
-    docs: `<img src="${base}/img/Docs_btn.svg" width="24" height="24" alt="Docs" />`,
-    search: `<img src="${base}/img/Search.svg" width="24" height="24" alt="Search" />`,
+    settings: `<img src="${base}/../../images/icons/Settings_btn.svg" width="24" height="24" alt="Settings" />`,
+    docs: `<img src="${base}/../../images/icons/Docs_btn.svg" width="24" height="24" alt="Docs" />`,
+    search: `<img src="${base}/../../images/icons/Search.svg" width="24" height="24" alt="Search" />`,
 });
 
 export function renderHeader(state, assetsBase) {
     const icons = getNavIcons(assetsBase || '');
     const brandIcons = getBrandIcons(assetsBase || '');
     const settingsActive = state.view === APP_VIEWS.SETTINGS ? ' is-active' : '';
-    const guidesActive = state.view === APP_VIEWS.GUIDES ? ' is-active' : '';
     const html = `
         <header class="dm-topbar">
             <button type="button" class="dm-topbar__brand" data-dm-nav="maps" aria-label="Developer Map" title="Developer Map">
@@ -30,7 +47,7 @@ export function renderHeader(state, assetsBase) {
                     <span class="dm-topbar__version">Version ${PLUGIN_VERSION}</span>
                 </div>
                 <span class="dm-topbar__mark" aria-hidden="true">${brandIcons.mark}</span>
-                <span class="dm-topbar__sr">Developer Map by FuuDobre</span>
+                <span class="dm-topbar__sr">Developer Map</span>
             </button>
             <div class="dm-topbar__right">
                 <div class="dm-topbar__search">
@@ -40,10 +57,6 @@ export function renderHeader(state, assetsBase) {
                 <button type="button" class="dm-topbar__link${settingsActive}" data-dm-nav="settings">
                     <span class="dm-topbar__link-icon" aria-hidden="true">${icons.settings}</span>
                     <span>Nastavenia</span>
-                </button>
-                <button type="button" class="dm-topbar__link${guidesActive}" data-dm-nav="guides">
-                    <span class="dm-topbar__link-icon" aria-hidden="true">${icons.docs}</span>
-                    <span>Návody</span>
                 </button>
             </div>
         </header>

@@ -287,15 +287,7 @@ final class DM_Rest_Controller
         $current = $project;
 
         while (true) {
-            $parentId = '';
-
-            if (isset($current['parentId'])) {
-                $parentId = strtolower(trim((string) $current['parentId']));
-            }
-
-            if ($parentId === '' && isset($current['parent']) && is_array($current['parent']) && isset($current['parent']['id'])) {
-                $parentId = strtolower(trim((string) $current['parent']['id']));
-            }
+            $parentId = self::extract_project_parent_id($current);
 
             if ($parentId === '' || isset($visited[$parentId]) || !isset($projectsById[$parentId])) {
                 break;
@@ -308,6 +300,106 @@ final class DM_Rest_Controller
         }
 
         return $ancestors;
+    }
+
+    /**
+     * Extract normalised parent ID from a project payload.
+     */
+    private static function extract_project_parent_id(array $project): string
+    {
+        $parentId = '';
+
+        if (isset($project['parentId'])) {
+            $parentId = (string) $project['parentId'];
+        }
+
+        if ($parentId === '' && isset($project['parent']) && is_array($project['parent']) && isset($project['parent']['id'])) {
+            $parentId = (string) $project['parent']['id'];
+        }
+
+        return strtolower(trim($parentId));
+    }
+
+    /**
+     * Return the project subtree that should power "hierarchy" table scope.
+     *
+     * If the requested project has a valid parent, the subtree is rooted at the parent (siblings + descendants).
+     * Otherwise, the subtree is rooted at the requested project itself (descendants only).
+     *
+     * @param array $project
+     * @param array<string, array> $projectsById
+     * @return array<string, array>
+     */
+    private static function resolve_hierarchy_projects(array $project, array $projectsById): array
+    {
+        $projectId = strtolower(trim((string) ($project['id'] ?? '')));
+        if ($projectId === '') {
+            return [];
+        }
+
+        $parentId = self::extract_project_parent_id($project);
+        $rootId = ($parentId !== '' && isset($projectsById[$parentId])) ? $parentId : $projectId;
+
+        // Build parent-child relationships from parentId
+        $childrenByParentId = [];
+        foreach ($projectsById as $candidateId => $candidate) {
+            $candidateParent = self::extract_project_parent_id($candidate);
+            if ($candidateParent === '') {
+                continue;
+            }
+            if (!isset($childrenByParentId[$candidateParent])) {
+                $childrenByParentId[$candidateParent] = [];
+            }
+            $childrenByParentId[$candidateParent][] = $candidateId;
+        }
+
+        // Build region-linked relationships (maps linked via region children)
+        $regionLinkedByProject = [];
+        foreach ($projectsById as $candidateId => $candidate) {
+            $linkedIds = self::extract_map_child_ids($candidate);
+            if (!empty($linkedIds)) {
+                $regionLinkedByProject[$candidateId] = $linkedIds;
+            }
+        }
+
+        $result = [];
+        $visited = [];
+        $stack = [$rootId];
+
+        while (!empty($stack)) {
+            $currentId = array_pop($stack);
+            if ($currentId === '' || isset($visited[$currentId])) {
+                continue;
+            }
+            $visited[$currentId] = true;
+
+            if (!isset($projectsById[$currentId])) {
+                continue;
+            }
+
+            $result[$currentId] = $projectsById[$currentId];
+
+            // Add children by parentId relationship
+            if (!empty($childrenByParentId[$currentId])) {
+                foreach ($childrenByParentId[$currentId] as $childId) {
+                    if (!isset($visited[$childId])) {
+                        $stack[] = $childId;
+                    }
+                }
+            }
+
+            // Add maps linked via regions
+            if (!empty($regionLinkedByProject[$currentId])) {
+                foreach ($regionLinkedByProject[$currentId] as $linkedId) {
+                    $normalizedLinkedId = strtolower(trim($linkedId));
+                    if (!isset($visited[$normalizedLinkedId]) && isset($projectsById[$normalizedLinkedId])) {
+                        $stack[] = $normalizedLinkedId;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -555,10 +647,14 @@ final class DM_Rest_Controller
         if ($matchedProject !== null) {
             $linkedProjects = self::resolve_linked_projects($matchedProject, $projectsById, $projectsByKey);
              $ancestors = self::resolve_project_ancestors($matchedProject, $projectsById);
+            $hierarchyProjects = self::resolve_hierarchy_projects($matchedProject, $projectsById);
+            $accent_color = DM_Storage_Manager::get('dm-frontend-accent-color');
             return new WP_REST_Response([
                 'project' => $matchedProject,
                 'linkedProjects' => array_values($linkedProjects),
                 'ancestors' => array_values($ancestors),
+                'hierarchyProjects' => array_values($hierarchyProjects),
+                'frontendAccentColor' => is_string($accent_color) && $accent_color !== '' ? $accent_color : '#4d38ff',
             ]);
         }
 
@@ -577,10 +673,14 @@ final class DM_Rest_Controller
                     $childPayload = self::build_floor_project_payload($project, $floor);
                     $linkedProjects = self::resolve_linked_projects($childPayload, $projectsById, $projectsByKey);
                     $ancestors = self::resolve_project_ancestors($childPayload, $projectsById);
+                    $hierarchyProjects = self::resolve_hierarchy_projects($childPayload, $projectsById);
+                    $accent_color = DM_Storage_Manager::get('dm-frontend-accent-color');
                     return new WP_REST_Response([
                         'project' => $childPayload,
                         'linkedProjects' => array_values($linkedProjects),
                         'ancestors' => array_values($ancestors),
+                        'hierarchyProjects' => array_values($hierarchyProjects),
+                        'frontendAccentColor' => is_string($accent_color) && $accent_color !== '' ? $accent_color : '#4d38ff',
                     ]);
                 }
             }

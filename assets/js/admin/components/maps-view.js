@@ -1,5 +1,23 @@
-import { MAP_SECTIONS } from '../constants.js';
-import { escapeHtml } from '../utils/html.js';
+const getModuleVersion = () => {
+    try {
+        const url = new URL(import.meta.url);
+        const fromUrl = url.searchParams.get('ver');
+        if (fromUrl) {
+            return fromUrl;
+        }
+    } catch (error) {
+        // ignore
+    }
+
+    return (typeof window !== 'undefined' && window.dmRuntimeConfig?.ver) || Date.now();
+};
+
+const ver = encodeURIComponent(String(getModuleVersion()));
+
+const [{ MAP_SECTIONS }, { escapeHtml }] = await Promise.all([
+    import(`../constants.js?ver=${ver}`),
+    import(`../utils/html.js?ver=${ver}`),
+]);
 
 export function renderMapsView(state, data) {
     const projectsCount = data.projects?.length ?? 0;
@@ -66,7 +84,7 @@ function renderColumnHeader(label, iconKey, extraClass = '') {
 
 function formatShortcode(mapKey) {
     const key = String(mapKey ?? '').trim();
-    return key ? `[fuudobre_map map_key="${key}"]` : '[fuudobre_map]';
+    return key ? `[dm_map map_key=\"${key}\"]` : '[dm_map]';
 }
 
 function normaliseText(value) {
@@ -202,8 +220,8 @@ function renderMapList(data, state) {
                         ${renderColumnHeader('Vloženie na web', 'embed')}
                     </div>
                     ${visibleProjects
-                        .map((project) => renderProjectRow(project, renderContext, { depth: 0 }))
-                        .join('')}
+            .map((project) => renderProjectRow(project, renderContext, { depth: 0 }))
+            .join('')}
                 </div>
             </div>
             <div class="dm-board__footer">
@@ -236,8 +254,8 @@ function renderProjectRow(project, context, options = {}) {
     const rawChildProjects = childProjectsMap.get(projectId) ?? [];
     const childProjects = hasNeedle
         ? rawChildProjects.filter((child) =>
-              parentMatches ? true : projectMatchesNeedle(child, new Set(projectId ? [projectId] : []))
-          )
+            parentMatches ? true : projectMatchesNeedle(child, new Set(projectId ? [projectId] : []))
+        )
         : rawChildProjects;
     const floors = Array.isArray(project?.floors) ? project.floors : [];
     const renderableFloors = hasNeedle && !parentMatches
@@ -293,17 +311,17 @@ function renderProjectRow(project, context, options = {}) {
             <div class="dm-board__cell dm-board__cell--type" role="cell" data-label="Typ:">${escapeHtml(project.type)}</div>
             <div class="dm-board__cell dm-board__cell--actions" role="cell" data-label="Akcie:">
                  ${renderActionButton('edit', 'Upraviť', {
-                    'data-dm-modal': 'edit-map',
-                    'data-dm-payload': projectId,
-                })}
+        'data-dm-modal': 'edit-map',
+        'data-dm-payload': projectId,
+    })}
                 ${renderActionButton('open', 'Editor súradníc', {
-                    'data-dm-modal': 'draw-coordinates',
-                    'data-dm-payload': projectId,
-                })}
+        'data-dm-modal': 'draw-coordinates',
+        'data-dm-payload': projectId,
+    })}
                 ${renderActionButton('delete', 'Zmazať', {
-                    'data-dm-modal': 'delete-map',
-                    'data-dm-payload': projectId,
-                })}
+        'data-dm-modal': 'delete-map',
+        'data-dm-payload': projectId,
+    })}
             </div>
             <div class="dm-board__cell dm-board__cell--shortcode" role="cell" data-label="Shortcode:">
                 <code>
@@ -354,17 +372,17 @@ function renderFloorRow(floor, parentShortcodeKey, index, depth = 1) {
             <div class="dm-board__cell dm-board__cell--type" role="cell" data-label="Typ:">${escapeHtml(floor.type)}</div>
             <div class="dm-board__cell dm-board__cell--actions" role="cell" data-label="Akcie:">
                 ${renderActionButton('edit', 'Upraviť', {
-                    'data-dm-modal': 'edit-location',
-                    'data-dm-payload': floor.id,
-                })}
+        'data-dm-modal': 'edit-location',
+        'data-dm-payload': floor.id,
+    })}
                 ${renderActionButton('open', 'Editor súradníc', {
-                    'data-dm-modal': 'draw-coordinates',
-                    'data-dm-payload': floor.id,
-                })}
+        'data-dm-modal': 'draw-coordinates',
+        'data-dm-payload': floor.id,
+    })}
                 ${renderActionButton('delete', 'Zmazať', {
-                    'data-dm-modal': 'delete-map',
-                    'data-dm-payload': floor.id,
-                })}
+        'data-dm-modal': 'delete-map',
+        'data-dm-payload': floor.id,
+    })}
             </div>
             <div class="dm-board__cell dm-board__cell--shortcode" role="cell" data-label="Shortcode:">
                 <code>

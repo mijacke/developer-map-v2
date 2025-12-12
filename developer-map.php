@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Developer Map by FuuDobre
+ * Plugin Name: Developer Map
  * Description: Administrátorský dashboard pre vytváranie interaktívnych máp a lokalít a ich zobrazenie na vašom webe.
- * Version: 0.4.4
+ * Version: 0.5.0
  * Author: Mario
  */
 
@@ -10,8 +10,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-dm-storage.php';
-require_once plugin_dir_path(__FILE__) . 'includes/class-dm-rest-controller.php';
+require_once plugin_dir_path(__FILE__) . 'includes/core/class-dm-storage.php';
+require_once plugin_dir_path(__FILE__) . 'includes/api/class-dm-rest-controller.php';
 
 /**
  * Handle POST requests made from the admin screen.
@@ -77,7 +77,7 @@ function dm_handle_ajax_ping(): void
 }
 add_action('wp_ajax_dm_ping', 'dm_handle_ajax_ping');
 
-define('DM_PLUGIN_VERSION', '0.4.4');
+define('DM_PLUGIN_VERSION', '0.5.0');
 define('DM_DEV_PAGE_SLUG', 'devtest-9kq7wza3');
 define('DM_PLUGIN_STYLE_HANDLE', 'developer-map-style');
 define('DM_PLUGIN_SCRIPT_HANDLE', 'developer-map-script');
@@ -102,7 +102,7 @@ function dm_get_assets_version(): string
         return $version;
     }
 
-    $base_path = plugin_dir_path(__FILE__) . 'public/assets/';
+    $base_path = plugin_dir_path(__FILE__) . 'assets/';
     $latest_mtime = 0;
 
     if (is_dir($base_path)) {
@@ -128,7 +128,8 @@ function dm_get_assets_version(): string
         }
     }
 
-    $suffix = $latest_mtime ?: time();
+    // Force cache bust for debugging
+    $suffix = time();
     $version = sprintf('%s-%s', DM_PLUGIN_VERSION, $suffix);
 
     return $version;
@@ -219,19 +220,19 @@ function dm_register_assets(): void
         return;
     }
 
-    $base_url = plugin_dir_url(__FILE__) . 'public/assets/';
+    $base_url = plugin_dir_url(__FILE__) . 'assets/';
     $version = dm_get_assets_version();
 
     wp_register_style(
         DM_PLUGIN_STYLE_HANDLE,
-        $base_url . 'dm.css',
+        $base_url . 'css/dm.css',
         [],
         $version
     );
 
     wp_register_script(
         DM_PLUGIN_SCRIPT_HANDLE,
-        $base_url . 'dm.js',
+        $base_url . 'js/dm.js',
         [],
         $version,
         true
@@ -382,7 +383,7 @@ if (DM_ENABLE_SHORTCODE_COMPAT) {
     });
 }
 
-add_shortcode('fuudobre_map', 'dm_render_fuudobre_map_shortcode');
+add_shortcode('dm_map', 'dm_render_dm_map_shortcode');
 
 function dm_register_frontend_map_assets(): void
 {
@@ -392,7 +393,7 @@ function dm_register_frontend_map_assets(): void
         return;
     }
 
-    $base_url = plugin_dir_url(__FILE__) . 'public/assets/frontend/';
+    $base_url = plugin_dir_url(__FILE__) . 'assets/js/frontend/';
     $version = dm_get_assets_version();
     wp_register_script(
         'developer-map-frontend',
@@ -405,17 +406,16 @@ function dm_register_frontend_map_assets(): void
     $registered = true;
 }
 
-function dm_render_fuudobre_map_shortcode($atts = []): string
+function dm_render_dm_map_shortcode($atts = []): string
 {
     $atts = shortcode_atts(
         [
             'map_key' => '',
             'show_table' => '0',
-            'table_mode' => 'current',
-            'include_parent' => '0',
+            'table_mode' => '',  // Empty = use project settings
         ],
         $atts,
-        'fuudobre_map'
+        'dm_map'
     );
 
     $map_key = sanitize_text_field($atts['map_key']);
@@ -430,11 +430,11 @@ function dm_render_fuudobre_map_shortcode($atts = []): string
     };
 
     $show_table = $normalise_bool($atts['show_table']);
-    $include_parent = $normalise_bool($atts['include_parent']);
 
+    // Only process table_mode if explicitly provided
     $table_mode = strtolower(trim((string) $atts['table_mode']));
-    if (!in_array($table_mode, ['current', 'hierarchy'], true)) {
-        $table_mode = 'current';
+    if ($table_mode !== '' && !in_array($table_mode, ['current', 'hierarchy'], true)) {
+        $table_mode = '';  // Invalid value, clear it to use project settings
     }
 
     dm_register_frontend_map_assets();
@@ -465,8 +465,9 @@ function dm_render_fuudobre_map_shortcode($atts = []): string
         $attributes[] = sprintf('data-dm-table-mode="%s"', esc_attr($table_mode));
     }
 
-    if ($include_parent) {
-        $attributes[] = 'data-dm-include-parent="1"';
+    $accent_color = DM_Storage_Manager::get('dm-frontend-accent-color');
+    if ($accent_color) {
+        $attributes[] = sprintf('data-dm-accent-color="%s"', esc_attr($accent_color));
     }
 
     $html = sprintf('<div %s></div>', implode(' ', $attributes));

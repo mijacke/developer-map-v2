@@ -10,6 +10,7 @@ export function createInitialData() {
         colors: [],
         availableFonts: [],
         selectedFont: null,
+        frontendAccentColor: '#4d38ff',
     };
 }
 
@@ -50,11 +51,7 @@ export function getDefaultColors() {
 
 export function getAvailableFonts() {
     return [
-        { id: 'inter', label: 'Inter (predvolený)', value: "'Inter', 'Segoe UI', sans-serif", description: 'Moderný, čitateľný sans-serif' },
-        { id: 'roboto', label: 'Roboto', value: "'Roboto', 'Segoe UI', sans-serif", description: 'Google Material Design font' },
-        { id: 'poppins', label: 'Poppins', value: "'Poppins', sans-serif", description: 'Geometrický, výrazný sans-serif' },
-        { id: 'playfair', label: 'Playfair Display', value: "'Playfair Display', Georgia, serif", description: 'Elegantný serif pre luxusný vzhľad' },
-        { id: 'fira-code', label: 'Fira Code', value: "'Fira Code', 'Courier New', monospace", description: 'Monospace font pre technický vzhľad' },
-        { id: 'courier', label: 'Courier Prime', value: "'Courier Prime', 'Courier New', monospace", description: 'Klasický písací stroj' },
+        { id: 'aboreto', label: 'Aboreto (predvolený)', value: "'Aboreto', 'Georgia', serif", description: 'Elegantný display font s unikátnym charakterom' },
+        { id: 'sf-pro', label: 'SF Pro', value: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif", description: 'Moderný Apple systémový font' },
     ];
 }

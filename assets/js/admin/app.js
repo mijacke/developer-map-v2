@@ -8,11 +8,11 @@ async function loadModules() {
     const [constants, data, layout, modals, storage, wpAdmin, header] = await Promise.all([
         import(`${base}/constants.js?ver=${ver}`),
         import(`${base}/data.js?ver=${ver}`),
-        import(`${base}/layout/app-shell.js?ver=${ver}`),
-        import(`${base}/modals/index.js?ver=${ver}`),
+        import(`${base}/components/app-shell.js?ver=${ver}`),
+        import(`${base}/components/modals.js?ver=${ver}`),
         import(`${base}/storage-client.js?ver=${ver}`),
         import(`${base}/wp-admin-layout.js?ver=${ver}`),
-        import(`${base}/layout/header.js?ver=${ver}`)
+        import(`${base}/components/header.js?ver=${ver}`)
     ]);
 
     return {
@@ -82,6 +82,7 @@ export async function initDeveloperMap(options) {
         availableFonts: null,
         selectedFont: null,
         fontBundle: null,
+        frontendAccentColor: null,
     };
 
     const data = createInitialData();
@@ -595,12 +596,13 @@ export async function initDeveloperMap(options) {
         };
 
         const staticTextColor = '#1C134F';
-        root.style.setProperty('--dm-heading-color', staticTextColor);
-        root.style.setProperty('--dm-content-text-color', staticTextColor);
-        root.style.setProperty('--dm-text', staticTextColor);
-        root.style.setProperty('--dm-map-modal-heading-color', staticTextColor);
-        root.style.setProperty('--dm-toolbar-text-color', staticTextColor);
-        root.style.setProperty('--dm-map-modal-content-color', staticTextColor);
+        const target = document.documentElement;
+        target.style.setProperty('--dm-heading-color', staticTextColor);
+        target.style.setProperty('--dm-content-text-color', staticTextColor);
+        target.style.setProperty('--dm-text', staticTextColor);
+        target.style.setProperty('--dm-map-modal-heading-color', staticTextColor);
+        target.style.setProperty('--dm-toolbar-text-color', staticTextColor);
+        target.style.setProperty('--dm-map-modal-content-color', staticTextColor);
 
         colors.forEach((color) => {
             // Support both 'name' and 'label' properties
@@ -610,20 +612,20 @@ export async function initDeveloperMap(options) {
             if (!label) return;
 
             if (label === 'Farba nadpisov' && typeof color.value === 'string' && color.value.trim()) {
-                root.style.setProperty('--dm-map-modal-heading-color', color.value.trim());
+                target.style.setProperty('--dm-map-modal-heading-color', color.value.trim());
                 return;
             }
 
             if (label === 'Farba obsahových textov' && typeof color.value === 'string' && color.value.trim()) {
                 const contentColor = color.value.trim();
-                root.style.setProperty('--dm-toolbar-text-color', contentColor);
-                root.style.setProperty('--dm-map-modal-content-color', contentColor);
+                target.style.setProperty('--dm-toolbar-text-color', contentColor);
+                target.style.setProperty('--dm-map-modal-content-color', contentColor);
                 return;
             }
 
             const varName = colorMap[label];
             if (varName && typeof color.value === 'string' && color.value.trim()) {
-                root.style.setProperty(varName, color.value.trim());
+                target.style.setProperty(varName, color.value.trim());
             }
         });
     }
@@ -782,7 +784,7 @@ export async function initDeveloperMap(options) {
             }
         }
 
-        const fallback = list.find((font) => font.id === 'inter') || list[0];
+        const fallback = list.find((font) => font.id === 'aboreto') || list[0];
         return fallback ? { ...fallback } : null;
     }
 
@@ -950,6 +952,14 @@ export async function initDeveloperMap(options) {
         applyStatusStyles(statuses);
     }
 
+    // Save frontend accent color via REST API
+    function saveFrontendAccentColor(color) {
+        const normalizedColor = typeof color === 'string' && color.match(/^#[0-9a-fA-F]{6}$/) ? color : '#4d38ff';
+        storageCache.frontendAccentColor = normalizedColor;
+        data.frontendAccentColor = normalizedColor;
+        persistValue('dm-frontend-accent-color', normalizedColor);
+    }
+
     async function hydrateStorage() {
         if (!storage || typeof storage.list !== 'function') {
             return;
@@ -1012,6 +1022,12 @@ export async function initDeveloperMap(options) {
                     if (selected) {
                         storageCache.selectedFont = cloneForStorage(selected);
                     }
+                }
+
+                // Hydrate frontend accent color
+                if (dataset['dm-frontend-accent-color'] && typeof dataset['dm-frontend-accent-color'] === 'string') {
+                    storageCache.frontendAccentColor = dataset['dm-frontend-accent-color'];
+                    data.frontendAccentColor = dataset['dm-frontend-accent-color'];
                 }
             }
         } catch (error) {
@@ -1110,20 +1126,19 @@ export async function initDeveloperMap(options) {
     data.colors = ensureColorsHaveNames(data.colors);
     applyColors(data.colors);
 
-    // Initialize fonts
-    const storedFonts = loadAvailableFonts();
-    const hadStoredFonts = Array.isArray(storedFonts) && storedFonts.length > 0;
-    let availableFonts = hadStoredFonts
-        ? normaliseAvailableFonts(storedFonts)
-        : normaliseAvailableFonts(getAvailableFonts());
-
+    // Initialize fonts - always use current defaults from getAvailableFonts()
+    let availableFonts = normaliseAvailableFonts(getAvailableFonts());
     availableFonts = setAvailableFonts(availableFonts, { persist: true });
 
     const savedFont = loadSelectedFont();
-    let selectedFont = normaliseSelectedFont(savedFont || { id: 'inter' }, availableFonts);
+    // Check if saved font is still available in the current font list
+    const savedFontStillExists = savedFont && availableFonts.some(f => f.id === savedFont.id);
+    let selectedFont = savedFontStillExists
+        ? normaliseSelectedFont(savedFont, availableFonts)
+        : normaliseSelectedFont({ id: 'aboreto' }, availableFonts);
 
-    if (!savedFont || !selectedFont) {
-        selectedFont = normaliseSelectedFont({ id: 'inter' }, availableFonts);
+    if (!selectedFont) {
+        selectedFont = normaliseSelectedFont({ id: 'aboreto' }, availableFonts);
     }
 
     saveSelectedFont(selectedFont);
@@ -1550,7 +1565,6 @@ export async function initDeveloperMap(options) {
                 project.frontend.locationTable = {
                     enabled: false,
                     scope: 'current',
-                    includeParent: false,
                 };
                 mutated = true;
                 return;
@@ -1567,12 +1581,6 @@ export async function initDeveloperMap(options) {
             ) {
                 tableSettings.scope = 'current';
                 mutated = true;
-            }
-            if (!Object.prototype.hasOwnProperty.call(tableSettings, 'includeParent')) {
-                tableSettings.includeParent = false;
-                mutated = true;
-            } else {
-                tableSettings.includeParent = Boolean(tableSettings.includeParent);
             }
         });
         return mutated;
@@ -2447,8 +2455,6 @@ export async function initDeveloperMap(options) {
                     setState({ view: APP_VIEWS.SETTINGS, settingsSection: SETTINGS_SECTIONS.OVERVIEW });
                 } else if (targetView === 'maps') {
                     setState({ view: APP_VIEWS.MAPS, mapSection: MAP_SECTIONS.LIST });
-                } else if (targetView === 'guides') {
-                    setState({ view: APP_VIEWS.GUIDES });
                 }
             });
         });
@@ -2689,6 +2695,77 @@ export async function initDeveloperMap(options) {
                 if (selectedFont) {
                     saveSelectedFont(selectedFont);
                     applySelectedFont(selectedFont);
+                    render();
+                }
+            });
+        });
+
+        // Frontend color picker in preview card - only for custom color
+        const frontendColorPicker = root.querySelector('[data-dm-frontend-color-picker]');
+        const customDot = root.querySelector('[data-dm-custom-dot]');
+        const colorInput = root.querySelector('[data-dm-frontend-color-input]');
+        const customBtn = root.querySelector('[data-dm-custom-color-btn]');
+
+        // Color picker change - auto-save on change
+        if (frontendColorPicker) {
+            frontendColorPicker.addEventListener('change', (event) => {
+                const newColor = event.target.value;
+                saveFrontendAccentColor(newColor);
+                render();
+            });
+            // Update preview while dragging
+            frontendColorPicker.addEventListener('input', (event) => {
+                const newColor = event.target.value;
+                if (customDot) customDot.style.background = newColor;
+                if (colorInput) colorInput.value = newColor;
+            });
+        }
+
+        // Text input for hex code - auto-save on blur or Enter
+        if (colorInput) {
+            const saveColorFromInput = () => {
+                let val = colorInput.value;
+                if (val && !val.startsWith('#')) val = '#' + val;
+                if (val.match(/^#[0-9a-fA-F]{6}$/)) {
+                    saveFrontendAccentColor(val);
+                    render();
+                }
+            };
+            colorInput.addEventListener('blur', saveColorFromInput);
+            colorInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    saveColorFromInput();
+                }
+            });
+            // Preview while typing
+            colorInput.addEventListener('input', (event) => {
+                let val = event.target.value;
+                if (val && !val.startsWith('#')) val = '#' + val;
+                if (val.match(/^#[0-9a-fA-F]{6}$/)) {
+                    if (customDot) customDot.style.background = val;
+                    if (frontendColorPicker) frontendColorPicker.value = val;
+                }
+            });
+        }
+
+        // Custom color button - selects black and shows preview
+        if (customBtn) {
+            customBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                saveFrontendAccentColor('#000000');
+                render();
+            });
+        }
+
+        // Frontend color preset buttons
+        const frontendColorPresets = root.querySelectorAll('[data-dm-frontend-color-preset]');
+        frontendColorPresets.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const colorVal = button.getAttribute('data-dm-frontend-color-preset');
+                if (colorVal) {
+                    saveFrontendAccentColor(colorVal);
                     render();
                 }
             });
@@ -4430,6 +4507,10 @@ export async function initDeveloperMap(options) {
 
         drawRoot.dataset.dmDrawReady = '1';
 
+        // Backward/forward-compatible alias: some helper code expects a `form` root.
+        // In the draw modal we don't render a <form>, so use the editor container (or drawRoot as fallback).
+        const form = drawRoot.closest('.dm-editor') || drawRoot;
+
         const overlay = drawRoot.querySelector('[data-role="overlay"]');
         const fill = drawRoot.querySelector('[data-role="fill"]');
         const outline = drawRoot.querySelector('[data-role="outline"]');
@@ -4438,9 +4519,9 @@ export async function initDeveloperMap(options) {
         const cursor = drawRoot.querySelector('.dm-draw__cursor');
         const stage = drawRoot.querySelector('.dm-draw__stage');
         const canvas = drawRoot.querySelector('.dm-draw__canvas');
-        const resetButton = root.querySelector('[data-dm-reset-draw]');
-        const revertButton = root.querySelector('[data-dm-revert-draw]');
-        const saveButton = root.querySelector('[data-dm-save-draw]');
+        const resetButton = form.querySelector('[data-dm-reset-draw]');
+        const revertButton = form.querySelector('[data-dm-revert-draw]');
+        const saveButton = form.querySelector('[data-dm-save-draw]');
         const regionList = drawRoot.querySelector('[data-dm-region-list]');
         const addRegionButton = drawRoot.querySelector('[data-dm-add-region]');
         const removeRegionButton = drawRoot.querySelector('[data-dm-remove-region]');
@@ -4452,8 +4533,8 @@ export async function initDeveloperMap(options) {
         const tableEnabledToggle = drawRoot.querySelector('[data-dm-table-enabled]');
         const tableScopeWrapper = drawRoot.querySelector('[data-dm-table-scope-wrapper]');
         const tableScopeField = drawRoot.querySelector('[data-dm-table-scope]');
-        const includeParentWrapper = drawRoot.querySelector('[data-dm-table-parent-wrapper]');
-        const includeParentToggle = drawRoot.querySelector('[data-dm-table-include-parent]');
+        const tableOnlyWrapper = drawRoot.querySelector('[data-dm-table-only-wrapper]');
+
 
         const updateLocalitiesSummary = () => {
             if (!localitiesSummaryCount || !regionChildrenFieldset) {
@@ -4546,12 +4627,10 @@ export async function initDeveloperMap(options) {
                 entity.frontend.locationTable = {
                     enabled: false,
                     scope: 'current',
-                    includeParent: false,
                 };
             }
             const settings = entity.frontend.locationTable;
             settings.enabled = Boolean(settings.enabled);
-            settings.includeParent = Boolean(settings.includeParent);
             if (settings.scope !== 'hierarchy') {
                 settings.scope = 'current';
             }
@@ -4568,17 +4647,14 @@ export async function initDeveloperMap(options) {
             if (tableScopeWrapper) {
                 tableScopeWrapper.hidden = !enabled;
             }
+            if (tableOnlyWrapper) {
+                tableOnlyWrapper.hidden = !enabled;
+            }
             if (tableScopeField) {
                 tableScopeField.disabled = !enabled;
                 tableScopeField.value = tableSettings.scope === 'hierarchy' ? 'hierarchy' : 'current';
             }
-            if (includeParentWrapper) {
-                includeParentWrapper.hidden = !enabled;
-            }
-            if (includeParentToggle) {
-                includeParentToggle.disabled = !enabled;
-                includeParentToggle.checked = Boolean(tableSettings.includeParent);
-            }
+
             if (tableEnabledToggle) {
                 tableEnabledToggle.checked = enabled;
             }
@@ -4586,9 +4662,30 @@ export async function initDeveloperMap(options) {
 
         if (tableSettings) {
             syncTableControls();
+
+            const tableOnlyToggle = drawRoot.querySelector('[data-dm-table-only]');
+
+            if (tableOnlyToggle) {
+                // Initial sync
+                if (typeof tableSettings.tableonly !== 'undefined') {
+                    tableOnlyToggle.checked = Boolean(tableSettings.tableonly);
+                }
+
+                tableOnlyToggle.addEventListener('change', () => {
+                    tableSettings.tableonly = tableOnlyToggle.checked;
+                });
+            }
+
             if (tableEnabledToggle) {
                 tableEnabledToggle.addEventListener('change', () => {
-                    tableSettings.enabled = tableEnabledToggle.checked;
+                    const isEnabled = tableEnabledToggle.checked;
+                    tableSettings.enabled = isEnabled;
+
+                    if (!isEnabled && tableOnlyToggle) {
+                        tableOnlyToggle.checked = false;
+                        tableSettings.tableonly = false;
+                    }
+
                     syncTableControls();
                 });
             }
@@ -4597,11 +4694,7 @@ export async function initDeveloperMap(options) {
                     tableSettings.scope = tableScopeField.value === 'hierarchy' ? 'hierarchy' : 'current';
                 });
             }
-            if (includeParentToggle) {
-                includeParentToggle.addEventListener('change', () => {
-                    tableSettings.includeParent = includeParentToggle.checked;
-                });
-            }
+
         }
 
         function setViewBoxSize(width, height, options = {}) {
@@ -6332,6 +6425,6 @@ export async function initDeveloperMap(options) {
     root.__dmInstance = instance;
     render();
     return instance;
-}
+};
 
 export default initDeveloperMap;

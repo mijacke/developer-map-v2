@@ -1,5 +1,23 @@
-import { createStorageClient } from './core/storage-client.js';
-import { migrateLocalStorage } from './core/storage-migration.js';
+const getModuleVersion = () => {
+  try {
+    const url = new URL(import.meta.url);
+    const fromUrl = url.searchParams.get('ver');
+    if (fromUrl) {
+      return fromUrl;
+    }
+  } catch (error) {
+    // ignore
+  }
+
+  return (typeof window !== 'undefined' && window.dmRuntimeConfig?.ver) || Date.now();
+};
+
+const ver = encodeURIComponent(String(getModuleVersion()));
+
+const [{ createStorageClient }, { migrateLocalStorage }] = await Promise.all([
+  import(`./admin/storage-client.js?ver=${ver}`),
+  import(`./admin/storage-migration.js?ver=${ver}`),
+]);
 
 /**
  * Developer Map — ES module entry (len pre [devmap] na dev stránke).
@@ -32,15 +50,15 @@ async function boot() {
   if (booted) return; booted = true;
 
   const root = document.querySelector(ROOT_SELECTOR);
-  if (!(root instanceof HTMLElement)) { 
-    console.warn('[DM] root not found'); 
-    return; 
+  if (!(root instanceof HTMLElement)) {
+    console.warn('[DM] root not found');
+    return;
   }
 
-  if (!runtimeConfig) { 
-    console.warn('[DM] missing runtime config'); 
-    fallback(root, 'Chýba runtime config'); 
-    return; 
+  if (!runtimeConfig) {
+    console.warn('[DM] missing runtime config');
+    fallback(root, 'Chýba runtime config');
+    return;
   }
 
   try {
@@ -63,12 +81,12 @@ async function boot() {
     }
 
     const base = new URL('./', import.meta.url);
-    const ver  = runtimeConfig.ver || Date.now();
-    
+    const ver = runtimeConfig.ver || Date.now();
+
     // Use import map workaround: append version to all module URLs
-    const appUrl = new URL(`./core/app.js?ver=${ver}`, base).href;
-    
-    const mod  = await import(/* @vite-ignore */ appUrl);
+    const appUrl = new URL(`./admin/app.js?ver=${ver}`, base).href;
+
+    const mod = await import(/* @vite-ignore */ appUrl);
 
     const init = mod.initDeveloperMap || mod.default;
     if (typeof init !== 'function') throw new Error('initDeveloperMap missing');

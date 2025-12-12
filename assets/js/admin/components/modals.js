@@ -1,5 +1,23 @@
-import { DRAW_VIEWBOX } from '../constants.js';
-import { escapeHtml } from '../utils/html.js';
+const getModuleVersion = () => {
+    try {
+        const url = new URL(import.meta.url);
+        const fromUrl = url.searchParams.get('ver');
+        if (fromUrl) {
+            return fromUrl;
+        }
+    } catch (error) {
+        // ignore
+    }
+
+    return (typeof window !== 'undefined' && window.dmRuntimeConfig?.ver) || Date.now();
+};
+
+const ver = encodeURIComponent(String(getModuleVersion()));
+
+const [{ DRAW_VIEWBOX }, { escapeHtml }] = await Promise.all([
+    import(`../constants.js?ver=${ver}`),
+    import(`../utils/html.js?ver=${ver}`),
+]);
 
 export { renderLocalitiesPopup };
 
@@ -87,7 +105,7 @@ function renderFormModal(title, cta, data, itemId = null, modalState = null) {
     const arrowIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
     const isEdit = title === 'Upraviť mapu';
     const headerIcon = isEdit ? arrowIcon : plusIcon;
-    
+
     // Zisti položku, ktorú upravujeme (project alebo floor)
     let editItem = null;
     let editParent = null;
@@ -173,7 +191,7 @@ function renderFormModal(title, cta, data, itemId = null, modalState = null) {
     const typePlaceholderLabel = typeOptionsSource.length
         ? 'Vyberte typ'
         : 'Najprv pridajte typ v nastaveniach';
-    
+
     const typeOptions = typeOptionsSource
         .map((option) => {
             const value = option.label;
@@ -181,7 +199,7 @@ function renderFormModal(title, cta, data, itemId = null, modalState = null) {
             return `<option value="${escapeHtml(value)}"${isSelected ? ' selected' : ''}>${escapeHtml(option.label)}</option>`;
         })
         .join('');
-    
+
     return `
         <div class="dm-modal-overlay">
             <div class="dm-modal dm-modal--map">
@@ -265,7 +283,7 @@ function renderLocationModal(title, cta, data, itemId = null, modalState = null)
     const arrowIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
     const isEdit = title.includes('Upraviť');
     const headerIcon = isEdit ? arrowIcon : plusIcon;
-    
+
     // Find the location being edited
     let editLocation = null;
     let editParent = null;
@@ -314,7 +332,7 @@ function renderLocationModal(title, cta, data, itemId = null, modalState = null)
 
     // Status select
     const statusOptionsSource = Array.isArray(data.statuses) ? data.statuses : [];
-    
+
     // Find active project for table settings
     const activeProject = (() => {
         // If editing, use parent project
@@ -328,14 +346,13 @@ function renderLocationModal(title, cta, data, itemId = null, modalState = null)
         // Otherwise use first project
         return projects[0] ?? null;
     })();
-    
+
     const tableSettings = (() => {
         const frontend = activeProject && typeof activeProject.frontend === 'object' ? activeProject.frontend : null;
         const table = frontend && typeof frontend.locationTable === 'object' ? frontend.locationTable : null;
         return {
             enabled: Boolean(table?.enabled),
             scope: table?.scope === 'hierarchy' ? 'hierarchy' : 'current',
-            includeParent: Boolean(table?.includeParent),
         };
     })();
     const statusIdFromState = formData.statusId ?? modalState?.statusId ?? null;
@@ -760,12 +777,12 @@ function renderDrawModal(state, data) {
     const npSorted =
         contextType === 'project'
             ? floorsForChildren
-                  .filter((floor) => /NP$/i.test(floor.label ?? ''))
-                  .sort((a, b) => {
-                      const aNum = parseInt(String(a.label).replace(/\D/g, ''), 10) || 0;
-                      const bNum = parseInt(String(b.label).replace(/\D/g, ''), 10) || 0;
-                      return bNum - aNum;
-                  })
+                .filter((floor) => /NP$/i.test(floor.label ?? ''))
+                .sort((a, b) => {
+                    const aNum = parseInt(String(a.label).replace(/\D/g, ''), 10) || 0;
+                    const bNum = parseInt(String(b.label).replace(/\D/g, ''), 10) || 0;
+                    return bNum - aNum;
+                })
             : [];
     const npLabels = (npSorted.length > 4 ? npSorted.slice(1, 5) : npSorted.slice(0, 4)).map((floor) => floor.label);
     const ppLabel =
@@ -784,7 +801,6 @@ function renderDrawModal(state, data) {
         return {
             enabled: Boolean(table?.enabled),
             scope: table?.scope === 'hierarchy' ? 'hierarchy' : 'current',
-            includeParent: Boolean(table?.includeParent),
         };
     })();
 
@@ -807,29 +823,29 @@ function renderDrawModal(state, data) {
     const selectedChildKeys = new Set(
         Array.isArray(activeRegion?.children)
             ? activeRegion.children
-                  .map((child) => resolveRegionChildKey(child))
-                  .filter(Boolean)
+                .map((child) => resolveRegionChildKey(child))
+                .filter(Boolean)
             : []
     );
 
     const regionListMarkup = regions.length
         ? regions
-              .map((region, index) => {
-                  // Always use region.id as key, never index
-                  const id = String(region.id ?? region.lotId ?? '');
-                  if (!id) {
-                      console.warn('[renderDrawModal] Region missing id:', region);
-                      return '';
-                  }
-                  const isActive = activeRegion
-                      ? String(activeRegion.id ?? '') === id
-                      : index === 0 && !activeRegionId;
-                  const label = region.label ?? region.name ?? `Zóna ${index + 1}`;
-                  const childCount = Array.isArray(region.children) ? region.children.length : 0;
-                  const connectionMeta = childCount > 0
-                      ? `Prepojených: ${childCount}`
-                      : 'Bez prepojení';
-                  return `
+            .map((region, index) => {
+                // Always use region.id as key, never index
+                const id = String(region.id ?? region.lotId ?? '');
+                if (!id) {
+                    console.warn('[renderDrawModal] Region missing id:', region);
+                    return '';
+                }
+                const isActive = activeRegion
+                    ? String(activeRegion.id ?? '') === id
+                    : index === 0 && !activeRegionId;
+                const label = region.label ?? region.name ?? `Zóna ${index + 1}`;
+                const childCount = Array.isArray(region.children) ? region.children.length : 0;
+                const connectionMeta = childCount > 0
+                    ? `Prepojených: ${childCount}`
+                    : 'Bez prepojení';
+                return `
                         <li class="dm-editor__zone-item${isActive ? ' dm-editor__zone-item--active' : ''}" data-dm-region-item="${escapeHtml(id)}">
                             <button type="button" class="dm-editor__zone-button" data-dm-region-trigger="${escapeHtml(id)}">
                                 <span class="dm-editor__zone-name">${escapeHtml(label)}</span>
@@ -837,9 +853,9 @@ function renderDrawModal(state, data) {
                             </button>
                         </li>
                     `;
-              })
-              .filter(Boolean)
-              .join('')
+            })
+            .filter(Boolean)
+            .join('')
         : `
                 <li class="dm-editor__zone-item dm-editor__zone-item--empty">
                     <span class="dm-editor__empty-text">Zatiaľ žiadne zóny</span>
@@ -1211,12 +1227,12 @@ function renderDrawModal(state, data) {
             const metaText = metaParts.join(' • ');
             const statusBadges = aggregate.statuses.length
                 ? aggregate.statuses
-                      .map((entry) => {
-                          const variant = slugifyStatus(entry.label);
-                          const inlineColor = entry.color ? ` style=\"--dm-status-color:${escapeHtml(entry.color)}\"` : '';
-                          return `<span class="dm-status dm-status--${escapeHtml(variant)}"${inlineColor}>${escapeHtml(entry.label)} (${entry.count})</span>`;
-                      })
-                      .join('')
+                    .map((entry) => {
+                        const variant = slugifyStatus(entry.label);
+                        const inlineColor = entry.color ? ` style=\"--dm-status-color:${escapeHtml(entry.color)}\"` : '';
+                        return `<span class="dm-status dm-status--${escapeHtml(variant)}"${inlineColor}>${escapeHtml(entry.label)} (${entry.count})</span>`;
+                    })
+                    .join('')
                 : '<span class="dm-localities-table__empty">Bez prepojených lokalít</span>';
             const descendantRowsAttr = descendantRowIds.length
                 ? ` data-dm-descendant-rows="${escapeHtml(descendantRowIds.join(' '))}"`
@@ -1348,10 +1364,10 @@ function renderDrawModal(state, data) {
                     data-dm-draw-root
                     data-dm-owner="${escapeHtml(contextType)}"
                     data-dm-owner-id="${escapeHtml(
-                        contextType === 'floor'
-                            ? activeFloor?.id ?? ''
-                            : activeProject?.id ?? '',
-                    )}"
+        contextType === 'floor'
+            ? activeFloor?.id ?? ''
+            : activeProject?.id ?? '',
+    )}"
                     data-dm-project-id="${escapeHtml(activeProject?.id ?? '')}"
                     data-dm-floor-name="${escapeHtml(surfaceLabel)}"
                     data-dm-active-region="${activeRegion ? escapeHtml(String(activeRegion.id)) : ''}"
@@ -1371,7 +1387,7 @@ function renderDrawModal(state, data) {
                         </div>
                         <div class="dm-editor__panel-footer">
                             <button type="button" class="dm-button dm-button--primary dm-editor__add-zone" data-dm-add-region>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
                                 </svg>
                                 Pridať zónu
@@ -1404,18 +1420,18 @@ function renderDrawModal(state, data) {
                                 ${levelLabels.length ? `
                                 <ul class="dm-draw__levels">
                                     ${levelLabels
-                                        .map(
-                                            (label) => `
+                .map(
+                    (label) => `
                                                 <li class="${activeFloor?.label === label ? 'is-active' : ''}">
                                                     ${escapeHtml(label)}
                                                 </li>
                                             `,
-                                        )
-                                        .join('')}
+                )
+                .join('')}
                                 </ul>` : ''}
                                 <button type="button" class="dm-draw__fullscreen-toggle" data-dm-fullscreen-toggle aria-pressed="false" aria-label="Zobraziť na celú obrazovku">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                        <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </svg>
                                 </button>
                             </div>
@@ -1438,9 +1454,6 @@ function renderDrawModal(state, data) {
                             <div class="dm-editor__panel-header">
                                 <h3>Detail zóny</h3>
                                 <button type="button" class="dm-button dm-button--outline dm-button--small dm-editor__remove-zone" data-dm-remove-region${canRemoveRegion ? '' : ' disabled aria-disabled="true"'}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-                                    </svg>
                                     Vymazať
                                 </button>
                             </div>
@@ -1455,34 +1468,37 @@ function renderDrawModal(state, data) {
                                     <label class="dm-field__label">URL</label>
                                 </div>
                                 ${contextType === 'project'
-                                    ? (() => {
-                                          const settings = tableSettings ?? {
-                                              enabled: false,
-                                              scope: 'current',
-                                              includeParent: false,
-                                          };
-                                          return `
+            ? (() => {
+                const settings = tableSettings ?? {
+                    enabled: false,
+                    scope: 'current',
+                };
+                return `
                                         <div class="dm-editor__fieldset dm-editor__fieldset--table">
-                                            <label class="dm-toggle">
-                                                <input type="checkbox" data-dm-table-enabled${settings.enabled ? ' checked' : ''}>
-                                                <span>Zobrazovať tabuľku lokalít pod každou mapou v hierarchii</span>
-                                            </label>
+                                                <label class="dm-toggle">
+                                                    <input type="checkbox" data-dm-table-enabled${settings.enabled ? ' checked' : ''}>
+                                                    <span>Zobraziť tabuľku lokalít pre aktuálnu mapu</span>
+                                                </label>
                                             <p class="dm-toggle__hint">Zobrazí rovnaké stĺpce ako v dashboarde priamo pod mapou.</p>
+                                            
                                             <div class="dm-field dm-field--compact" data-dm-table-scope-wrapper${settings.enabled ? '' : ' hidden'}>
                                                 <select class="dm-field__input" data-dm-table-scope${settings.enabled ? '' : ' disabled'}>
-                                                    <option value="current"${settings.scope === 'current' ? ' selected' : ''}>Len aktuálna mapa</option>
-                                                    <option value="hierarchy"${settings.scope === 'hierarchy' ? ' selected' : ''}>Celá hierarchia</option>
+                                                    <option value="current"${settings.scope === 'current' ? ' selected' : ''}>Aktuálna mapa</option>
+                                                    <option value="hierarchy"${settings.scope === 'hierarchy' ? ' selected' : ''}>Aktuálna + podraadené</option>
                                                 </select>
                                                 <label class="dm-field__label">Rozsah tabuľky</label>
                                             </div>
-                                            <label class="dm-toggle dm-toggle--nested" data-dm-table-parent-wrapper${settings.enabled ? '' : ' hidden'}>
-                                                <input type="checkbox" data-dm-table-include-parent${settings.includeParent ? ' checked' : ''}${settings.enabled ? '' : ' disabled'}>
-                                                <span>Zobraziť aj lokality nadradenej mapy</span>
-                                            </label>
+
+                                            <div style="margin-top: 12px; padding-left: 2px;" data-dm-table-only-wrapper${settings.enabled ? '' : ' hidden'}>
+                                                <label class="dm-toggle">
+                                                    <input type="checkbox" data-dm-table-only${settings.tableonly ? ' checked' : ''}${settings.enabled ? '' : ' disabled'}>
+                                                    <span>Zobraziť iba tabuľku bez obrázku</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         `;
-                                      })()
-                                    : ''}
+            })()
+            : ''}
                             </div>
                         </div>
                         
@@ -1493,10 +1509,10 @@ function renderDrawModal(state, data) {
                             </div>
                             <div class="dm-editor__panel-content dm-editor__panel-content--scrollable">
                                 ${contextType === 'project'
-                                    ? hasLinkableRows
-                                        ? `
+            ? hasLinkableRows
+                ? `
                                             <button type="button" class="dm-button dm-button--primary dm-button--full-width" data-dm-open-localities-popup>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                                                     <circle cx="12" cy="10" r="3"/>
                                                 </svg>
@@ -1513,12 +1529,12 @@ function renderDrawModal(state, data) {
                                                 </table>
                                             </div>
                                         `
-                                        : `
+                : `
                                             <p class="dm-editor__empty-message">
                                                 Žiadne dostupné prepojenia. Skontrolujte, či projekt obsahuje podriadené mapy alebo lokality.
                                             </p>
                                         `
-                                    : `
+            : `
                                         <p class="dm-editor__empty-message">
                                             V tomto režime nie sú dostupné prepojenia.
                                         </p>
@@ -1536,14 +1552,8 @@ function renderDrawModal(state, data) {
                         </svg>
                         Reset
                     </button>
-                    <button type="button" class="dm-button dm-button--outline" data-dm-revert-draw>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4v6h6"/><path d="M20 20V8a6 6 0 00-6-6H6"/><path d="M4 11a9 9 0 009 9h7"/>
-                        </svg>
-                        Obnoviť uložené
-                    </button>
                     <button type="button" class="dm-button dm-button--primary" data-dm-save-draw>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                             <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
                         </svg>
                         Uložiť a zatvoriť
@@ -1620,7 +1630,7 @@ function renderSimpleForm(placeholder) {
 function renderColorModal(data, payload) {
     const colorId = payload || 'color-1';
     const color = data.colors.find((c) => c.id === colorId) || data.colors[0];
-    
+
     return `
         <div class="dm-modal-overlay">
             <div class="dm-modal dm-modal--narrow">

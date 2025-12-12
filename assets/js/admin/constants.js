@@ -2,7 +2,6 @@ export const APP_VIEWS = {
     MAPS: 'maps',
     DASHBOARD: 'dashboard',
     SETTINGS: 'settings',
-    GUIDES: 'guides',
 };
 
 export const MAP_SECTIONS = {
@@ -15,6 +14,7 @@ export const SETTINGS_SECTIONS = {
     STATUSES: 'statuses',
     COLORS: 'colors',
     FONTS: 'fonts',
+    FRONTEND_STYLING: 'frontend-styling',
 };
 
 export const DRAW_VIEWBOX = { width: 1280, height: 720 };

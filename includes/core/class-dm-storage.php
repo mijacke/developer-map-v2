@@ -30,6 +30,7 @@ final class DM_Storage_Manager
     'dm-images'              => ['scope' => 'option'],
     'dm-selected-font'       => ['scope' => 'option'],
     'dm-fonts'               => ['scope' => 'option'],
+    'dm-frontend-accent-color' => ['scope' => 'option'],
     ];
 
     /**

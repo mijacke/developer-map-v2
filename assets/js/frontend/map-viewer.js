@@ -18,10 +18,10 @@
     const dashboardResizeObserver =
         typeof ResizeObserver !== 'undefined'
             ? new ResizeObserver((entries) => {
-                  entries.forEach(({ target, contentRect }) => {
-                      applyDashboardStackState(target, contentRect?.width ?? contentRect?.inlineSize);
-                  });
-              })
+                entries.forEach(({ target, contentRect }) => {
+                    applyDashboardStackState(target, contentRect?.width ?? contentRect?.inlineSize);
+                });
+            })
             : null;
 
     function applyDashboardStackState(element, measuredWidth) {
@@ -302,7 +302,7 @@
         const style = document.createElement('style');
         style.id = STYLE_ID;
         style.textContent = `
-            .dm-map-viewer { font-family: 'Inter', 'Segoe UI', sans-serif; margin: 1.5rem 0; }
+            .dm-map-viewer { font-family: 'Inter', 'Segoe UI', sans-serif; margin: 1.5rem 0; --dm-accent: #4d38ff; --dm-accent-rgb: 77, 56, 255; }
             .dm-map-viewer__card { border: 1px solid rgba(15, 23, 42, 0.12); border-radius: 18px; padding: 24px; background: #ffffff; box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06); display: grid; gap: 24px; }
             .dm-map-viewer__header h3 { margin: 0; font-size: 1.4rem; color: #1c134f; }
             .dm-map-viewer__header p { margin: 8px 0 0; color: #475569; line-height: 1.5; }
@@ -327,14 +327,15 @@
             .dm-map-viewer__popover-card { background: #ffffff; border-radius: 16px; padding: 18px 20px; box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22); min-width: 220px; max-width: 280px; border: 1px solid rgba(15, 23, 42, 0.08); display: flex; flex-direction: column; gap: 12px; }
             .dm-map-viewer__popover-summary { font-weight: 600; font-size: 0.95rem; color: #1c134f; text-align: center; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
             .dm-map-viewer__popover-summary strong { color: #16a34a; font-size: 1.05rem; margin-right: 6px; }
-            .dm-map-viewer__popover-label { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: var(--dm-popover-label-bg, rgba(99, 102, 241, 0.12)); color: var(--dm-popover-label-color, #1c134f); border: 1px solid var(--dm-popover-label-border, transparent); }
+            .dm-map-viewer__popover-label { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: var(--dm-popover-label-bg, rgba(var(--dm-accent-rgb, 77, 56, 255), 0.12)); color: var(--dm-popover-label-color, #1c134f); border: 1px solid var(--dm-popover-label-border, transparent); }
             .dm-map-viewer__popover-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #334155; }
             .dm-map-viewer__popover-list li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; }
-            .dm-map-viewer__popover-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dm-status-color, #6366f1); box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15); }
+            .dm-map-viewer__popover-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dm-status-color, #6366f1); box-shadow: 0 0 0 2px rgba(var(--dm-accent-rgb, 77, 56, 255), 0.15); }
             .dm-map-viewer__popover-empty { font-size: 0.85rem; color: #64748b; text-align: center; }
-            .dm-map-viewer__popover-cta { border: none; border-radius: 10px; padding: 10px 18px; background: #4d38ff; color: #ffffff; font-weight: 600; font-size: 0.9rem; cursor: pointer; align-self: center; min-width: 140px; text-align: center; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 12px 24px rgba(77, 56, 255, 0.18); }
-            .dm-map-viewer__popover-cta:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(77, 56, 255, 0.26); }
-            .dm-map-viewer__popover-cta:active { transform: translateY(0); }
+            .dm-map-viewer__popover-cta { border: none; border-radius: 10px; padding: 10px 18px; background: var(--dm-accent, #4d38ff); color: #ffffff; font-weight: 600; font-size: 0.9rem; cursor: pointer; align-self: center; min-width: 140px; text-align: center; transition: transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 12px 24px rgba(var(--dm-accent-rgb, 77, 56, 255), 0.18); }
+            .dm-map-viewer__popover-cta:hover { background: var(--dm-accent, #4d38ff); transform: translateY(-1px); box-shadow: 0 16px 32px rgba(var(--dm-accent-rgb, 77, 56, 255), 0.26); }
+            .dm-map-viewer__popover-cta:active { background: var(--dm-accent, #4d38ff); transform: translateY(0); }
+            .dm-map-viewer__popover-cta:focus { background: var(--dm-accent, #4d38ff); outline: 2px solid var(--dm-accent, #4d38ff); outline-offset: 2px; }
             .dm-map-viewer__tables { margin-top: 32px; display: flex; flex-direction: column; gap: 40px; }
             .dm-dashboard--public {
                 font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -344,7 +345,7 @@
                 gap: 24px;
                 --dm-filter-surface: #ffffff;
                 --dm-filter-border: rgba(28, 19, 79, 0.16);
-                --dm-filter-border-strong: rgba(77, 56, 255, 0.4);
+                --dm-filter-border-strong: rgba(var(--dm-accent-rgb), 0.4);
                 --dm-filter-shadow: 0 18px 32px rgba(18, 17, 51, 0.12);
                 --dm-filter-radius: clamp(14px, 2vw, 18px);
                 --dm-filter-height: clamp(46px, 5.5vw, 54px);
@@ -355,34 +356,34 @@
             .dm-dashboard--public .dm-dashboard__heading h1 { margin: 0; font-size: clamp(1.4rem, 3vw, 1.8rem); color: #1C134F; }
             .dm-dashboard--public .dm-dashboard__heading p { margin: 0; color: #6b6a84; font-size: 0.95rem; }
             .dm-dashboard--public .dm-dashboard__heading-note { margin: 0; color: #6b6a84; font-size: 0.9rem; }
-            .dm-dashboard--public .dm-dashboard__summary { font-weight: 600; color: #4d38ff; font-size: 0.95rem; margin-top: -8px; }
-            .dm-dashboard--public .dm-dashboard__toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: clamp(12px, 2vw, 18px); align-items: stretch; }
-            .dm-dashboard--public .dm-dashboard__search { width: 100%; min-height: var(--dm-filter-height); border: none; border-radius: var(--dm-filter-radius); display: flex; align-items: center; gap: 12px; padding: 0 clamp(16px, 2vw, 22px); background: var(--dm-filter-surface); box-shadow: var(--dm-filter-shadow); transition: box-shadow 0.2s ease, transform 0.2s ease; }
-            .dm-dashboard--public .dm-dashboard__search:focus-within { box-shadow: 0 24px 48px rgba(77, 56, 255, 0.22); transform: translateY(-1px); }
-            .dm-dashboard--public .dm-dashboard__search input { border: none; background: transparent; flex: 1; font-size: 0.95rem; color: #1C134F; height: 100%; }
-            .dm-dashboard--public .dm-dashboard__search input::placeholder { color: rgba(28, 19, 79, 0.45); }
+            .dm-dashboard--public .dm-dashboard__summary { font-weight: 600; color: var(--dm-accent); font-size: 0.95rem; margin-top: -8px; }
+            .dm-dashboard--public .dm-dashboard__toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(12px, 2vw, 18px); align-items: end; }
+            .dm-dashboard--public .dm-dashboard__search-wrapper { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+            .dm-dashboard--public .dm-dashboard__search-label { font-size: 0.78rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dm-filter-label); text-align: center; }
+            .dm-dashboard--public .dm-dashboard__search { width: 100%; min-height: var(--dm-filter-height); border: 1.5px solid var(--dm-filter-border); border-radius: var(--dm-filter-radius); display: flex; align-items: center; gap: 12px; padding: 0 clamp(16px, 2vw, 22px); background: #ffffff; box-shadow: var(--dm-filter-shadow); transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease; }
+            .dm-dashboard--public .dm-dashboard__search:focus-within { box-shadow: 0 24px 48px rgba(var(--dm-accent-rgb), 0.22); transform: translateY(-1px); border-color: var(--dm-filter-border-strong); }
+            .dm-dashboard--public .dm-dashboard__search input { border: none; background: transparent; flex: 1; font-size: 0.95rem; font-weight: 600; color: #1C134F; height: 100%; text-align: left; }
+            .dm-dashboard--public .dm-dashboard__search input::placeholder { color: rgba(28, 19, 79, 0.45); font-weight: 600; }
             .dm-dashboard--public .dm-dashboard__search input:focus { outline: none; }
-            .dm-dashboard--public .dm-dashboard__search-icon { width: 18px; height: 18px; color: rgba(28, 19, 79, 0.75); display: inline-flex; }
-            .dm-dashboard--public .dm-dashboard__select { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #4a4a68; position: relative; }
-            .dm-dashboard--public .dm-dashboard__select-label { font-size: 0.78rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dm-filter-label); padding-left: 6px; }
+            .dm-dashboard--public .dm-dashboard__search-icon { width: 18px; height: 18px; color: rgba(28, 19, 79, 0.75); display: inline-flex; flex-shrink: 0; }
+            .dm-dashboard--public .dm-dashboard__select { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: #4a4a68; position: relative; align-items: center; }
+            .dm-dashboard--public .dm-dashboard__select-label { font-size: 0.78rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dm-filter-label); text-align: center; }
             .dm-dashboard--public .dm-dashboard__select--has-value .dm-dashboard__select-label { color: #1C134F; }
-            .dm-dashboard--public .dm-dashboard__select-trigger { position: relative; width: 100%; min-height: var(--dm-filter-height); border-radius: var(--dm-filter-radius); border: 1.5px solid var(--dm-filter-border); background: var(--dm-filter-surface); padding: 0 clamp(48px, 5vw, 56px) 0 clamp(16px, 2vw, 22px); display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: var(--dm-filter-shadow); color: #1C134F; font-size: 0.95rem; font-weight: 600; transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
-            .dm-dashboard--public .dm-dashboard__select-trigger:focus-visible { outline: none; border-color: var(--dm-filter-border-strong); box-shadow: 0 24px 48px rgba(77, 56, 255, 0.22); }
-            .dm-dashboard--public .dm-dashboard__select.is-open .dm-dashboard__select-trigger { border-color: var(--dm-filter-border-strong); box-shadow: 0 24px 48px rgba(77, 56, 255, 0.22); transform: translateY(-1px); }
-            .dm-dashboard--public .dm-dashboard__select-value { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            .dm-dashboard--public .dm-dashboard__select-icon { position: absolute; right: clamp(18px, 2.6vw, 22px); top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(77, 56, 255, 0.08); color: rgba(28, 19, 79, 0.65); pointer-events: none; transition: transform 0.2s ease; }
-            .dm-dashboard--public .dm-dashboard__select-icon::before { content: ''; width: 10px; height: 10px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); display: block; }
-            .dm-dashboard--public .dm-dashboard__select.is-open .dm-dashboard__select-icon::before { transform: rotate(225deg); }
-            .dm-dashboard--public .dm-dashboard__select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--dm-filter-surface); border: 1.5px solid rgba(28, 19, 79, 0.22); border-radius: clamp(16px, 2.4vw, 20px); box-shadow: 0 26px 48px rgba(15, 23, 42, 0.22); padding: clamp(6px, 1vw, 10px); z-index: 60; max-height: min(40vh, 320px); overflow: hidden; }
+            .dm-dashboard--public .dm-dashboard__select-trigger { position: relative; width: 100%; min-height: var(--dm-filter-height); border-radius: var(--dm-filter-radius); border: 1.5px solid var(--dm-filter-border); background: #ffffff; padding: 0 clamp(48px, 5vw, 56px); display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: var(--dm-filter-shadow); color: #1C134F; font-size: 0.95rem; font-weight: 600; text-align: center; transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease; }
+            .dm-dashboard--public .dm-dashboard__select-trigger:focus-visible { outline: none; border-color: var(--dm-filter-border-strong); box-shadow: 0 24px 48px rgba(var(--dm-accent-rgb), 0.22); }
+            .dm-dashboard--public .dm-dashboard__select.is-open .dm-dashboard__select-trigger { border-color: var(--dm-filter-border-strong); box-shadow: 0 24px 48px rgba(var(--dm-accent-rgb), 0.22); transform: translateY(-1px); }
+            .dm-dashboard--public .dm-dashboard__select-value { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+            .dm-dashboard--public .dm-dashboard__select-icon { position: absolute; right: clamp(18px, 2.6vw, 22px); top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231C134F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat center center; background-size: contain; pointer-events: none; }
+            .dm-dashboard--public .dm-dashboard__select-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: #ffffff; border: 1.5px solid rgba(var(--dm-accent-rgb), 0.22); border-radius: clamp(16px, 2.4vw, 20px); box-shadow: 0 26px 48px rgba(15, 23, 42, 0.22); padding: clamp(6px, 1vw, 10px); z-index: 60; max-height: min(40vh, 320px); overflow: hidden; }
             .dm-dashboard--public .dm-dashboard__select-dropdown[hidden] { display: none; }
             .dm-dashboard--public .dm-dashboard__select-dropdown-inner { display: flex; flex-direction: column; gap: 6px; max-height: min(40vh, 320px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
             .dm-dashboard--public .dm-dashboard__select-dropdown-inner::-webkit-scrollbar { width: 8px; }
-            .dm-dashboard--public .dm-dashboard__select-dropdown-inner::-webkit-scrollbar-track { background: rgba(77, 56, 255, 0.08); border-radius: 999px; }
-            .dm-dashboard--public .dm-dashboard__select-dropdown-inner::-webkit-scrollbar-thumb { background: rgba(77, 56, 255, 0.32); border-radius: 999px; }
+            .dm-dashboard--public .dm-dashboard__select-dropdown-inner::-webkit-scrollbar-track { background: rgba(var(--dm-accent-rgb), 0.08); border-radius: 999px; }
+            .dm-dashboard--public .dm-dashboard__select-dropdown-inner::-webkit-scrollbar-thumb { background: rgba(var(--dm-accent-rgb), 0.32); border-radius: 999px; }
             .dm-dashboard--public .dm-dashboard__select-option { border: none; border-radius: clamp(12px, 1.8vw, 14px); background: transparent; padding: 12px 16px; text-align: left; font-size: 0.95rem; font-weight: 600; color: #1c134f; cursor: pointer; transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease; }
-            .dm-dashboard--public .dm-dashboard__select-option:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(77, 56, 255, 0.25); }
-            .dm-dashboard--public .dm-dashboard__select-option:hover { background: rgba(77, 56, 255, 0.12); color: #2b217c; transform: translateY(-1px); }
-            .dm-dashboard--public .dm-dashboard__select-option.is-selected { background: rgba(77, 56, 255, 0.18); color: #2b217c; box-shadow: inset 0 0 0 1px rgba(77, 56, 255, 0.16); }
+            .dm-dashboard--public .dm-dashboard__select-option:focus { outline: none; box-shadow: inset 0 0 0 2px rgba(var(--dm-accent-rgb), 0.25); }
+            .dm-dashboard--public .dm-dashboard__select-option:hover { background: rgba(var(--dm-accent-rgb), 0.12); color: var(--dm-accent); transform: translateY(-1px); }
+            .dm-dashboard--public .dm-dashboard__select-option.is-selected { background: rgba(var(--dm-accent-rgb), 0.18); color: var(--dm-accent); box-shadow: inset 0 0 0 1px rgba(var(--dm-accent-rgb), 0.16); }
             .dm-dashboard--public .dm-dashboard__select-option.is-disabled { opacity: 0.45; cursor: not-allowed; }
             .dm-dashboard--public .dm-dashboard__select-option.is-disabled:hover,
             .dm-dashboard--public .dm-dashboard__select-option.is-disabled:focus { background: transparent; color: inherit; transform: none; box-shadow: none; }
@@ -400,7 +401,7 @@
             .dm-dashboard--public .dm-dashboard__table tbody tr { display: grid; grid-template-columns: minmax(90px, 0.9fr) minmax(140px, 1.2fr) minmax(90px, 0.9fr) minmax(90px, 0.8fr) minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr); gap: 14px; align-items: center; }
             .dm-dashboard--public .dm-dashboard__table thead tr { background: transparent; border-radius: 0; padding: 0 0 12px; border-bottom: 1px solid rgba(28, 19, 79, 0.08); }
             .dm-dashboard--public .dm-dashboard__table th,
-            .dm-dashboard--public .dm-dashboard__table td { border: none !important; box-shadow: none !important; background: transparent; }
+            .dm-dashboard--public .dm-dashboard__table td { border: none !important; box-shadow: none !important; background: transparent; text-align: center; }
             .dm-dashboard--public .dm-dashboard__table th { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: rgba(45, 45, 78, 0.6); }
             .dm-dashboard--public .dm-dashboard__table tbody { display: flex; flex-direction: column; gap: 0; }
             .dm-dashboard--public .dm-dashboard__table tbody tr { padding: 18px 0; border-bottom: 1px solid rgba(28, 19, 79, 0.06); background: transparent; }
@@ -408,11 +409,11 @@
             .dm-dashboard--public .dm-dashboard__table td { font-size: 0.95rem; color: #1C134F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .dm-dashboard--public .dm-dashboard__link { color: #1C134F; font-weight: 600; text-decoration: none; }
             .dm-dashboard--public .dm-dashboard__link:hover,
-            .dm-dashboard--public .dm-dashboard__link:focus { color: #4d38ff; text-decoration: underline; }
+            .dm-dashboard--public .dm-dashboard__link:focus { color: var(--dm-accent); text-decoration: underline; }
             .dm-dashboard--public .dm-dashboard__text { font-weight: 600; color: #1C134F; }
-            .dm-dashboard--public .dm-dashboard__parent-tag { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: rgba(77, 56, 255, 0.08); color: #4d38ff; border: 1px solid rgba(77, 56, 255, 0.2); }
+            .dm-dashboard--public .dm-dashboard__parent-tag { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: rgba(var(--dm-accent-rgb), 0.08); color: var(--dm-accent); border: 1px solid rgba(var(--dm-accent-rgb), 0.2); }
             .dm-dashboard--public .dm-status { display: inline-flex; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 0.85rem; background: rgba(124, 58, 237, 0.12); color: rgba(45, 45, 78, 0.85); }
-            .dm-dashboard--public .dm-status--volne { background: #dcfce7; color: #15803d; }
+            .dm-dashboard--public .dm-status--volne { background: #dcfce7; color: #16803C; }
             .dm-dashboard--public .dm-status--obsadene,
             .dm-dashboard--public .dm-status--predane { background: #fee2e2; color: #b91c1c; }
             .dm-dashboard--public .dm-status--rezervovane { background: #fef3c7; color: #b45309; }
@@ -420,14 +421,23 @@
             .dm-dashboard--public .dm-dashboard__empty-row td { padding: 40px 24px; text-align: center; font-size: 0.95rem; color: #64748b; grid-column: 1 / -1; }
             .dm-dashboard--public .dm-dashboard__legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 4px 0 12px; }
             .dm-dashboard--public .dm-dashboard__legend-heading { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(45, 45, 78, 0.6); font-weight: 700; margin-right: 4px; }
-            .dm-dashboard--public .dm-dashboard__legend-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(28, 19, 79, 0.12); background: rgba(28, 19, 79, 0.04); color: #1C134F; }
-            .dm-dashboard--public .dm-dashboard__legend-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 4px rgba(28, 19, 79, 0.08); }
+            .dm-dashboard--public .dm-dashboard__legend-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+            .dm-dashboard--public .dm-dashboard__legend-badge--volne { background: #dcfce7; color: #16803C; }
+            .dm-dashboard--public .dm-dashboard__legend-badge--obsadene,
+            .dm-dashboard--public .dm-dashboard__legend-badge--predane { background: #fee2e2; color: #b91c1c; }
+            .dm-dashboard--public .dm-dashboard__legend-badge--rezervovane { background: #fef3c7; color: #b45309; }
+            .dm-dashboard--public .dm-dashboard__legend-badge--unknown { background: rgba(124, 58, 237, 0.12); color: rgba(45, 45, 78, 0.65); }
+            .dm-dashboard--public .dm-dashboard__legend-dot { width: 10px; height: 10px; border-radius: 50%; }
             .dm-dashboard--public .dm-dashboard__legend--public { justify-content: flex-start; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table thead { display: none; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table tbody tr { display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(28, 19, 79, 0.08); border-radius: 18px; padding: 18px 18px; background: #ffffff; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table td { width: 100%; display: flex; justify-content: space-between; align-items: center; white-space: normal; background: transparent; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table td::before { content: attr(data-label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(45, 45, 78, 0.6); margin-right: 12px; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__toolbar { grid-template-columns: 1fr; }
+            @media (max-width: 1000px) {
+                .dm-dashboard--public .dm-dashboard__toolbar { grid-template-columns: 1fr 1fr; }
+                .dm-dashboard--public .dm-dashboard__search-wrapper { grid-column: 1 / -1; }
+            }
             @media (max-width: 900px) {
                 .dm-dashboard--public .dm-dashboard__table thead { display: none; }
                 .dm-dashboard--public .dm-dashboard__table tbody tr { display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(28, 19, 79, 0.08); border-radius: 18px; padding: 18px 18px; background: #ffffff; }
@@ -448,6 +458,13 @@
             return min;
         }
         return Math.min(max, Math.max(min, value));
+    }
+
+    function hexToRgb(hex) {
+        if (!hex || typeof hex !== 'string') return '77, 56, 255';
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if (!result) return '77, 56, 255';
+        return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
     }
 
     function toRgba(color, alpha = 1) {
@@ -533,10 +550,6 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
-
-    const DASHBOARD_ICONS = {
-        search: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
-    };
 
     const normaliseText = (value) => {
         const raw = String(value ?? '')
@@ -746,15 +759,15 @@
             : null;
         const datasetScope =
             typeof dataset.dmTableMode === 'string' ? dataset.dmTableMode.trim().toLowerCase() : null;
-        const datasetIncludeParent = Object.prototype.hasOwnProperty.call(dataset, 'dmIncludeParent')
-            ? parseBooleanFlag(dataset.dmIncludeParent)
-            : null;
+
+
 
         const projectSettings = (() => {
             if (!project || typeof project !== 'object') {
                 return null;
             }
             const frontend = project.frontend && typeof project.frontend === 'object' ? project.frontend : null;
+
             if (frontend && typeof frontend.locationTable === 'object') {
                 return frontend.locationTable;
             }
@@ -764,6 +777,8 @@
             return null;
         })();
 
+
+
         const enabled =
             datasetEnabled !== null
                 ? datasetEnabled
@@ -771,41 +786,155 @@
                     ? parseBooleanFlag(projectSettings.enabled)
                     : false;
 
+        const tableOnly =
+            projectSettings && Object.prototype.hasOwnProperty.call(projectSettings, 'tableonly')
+                ? parseBooleanFlag(projectSettings.tableonly)
+                : false;
+
         const scopeCandidate = (datasetScope || projectSettings?.scope || '').toLowerCase();
         const scope = scopeCandidate === 'hierarchy' ? 'hierarchy' : 'current';
 
-        const includeParent =
-            datasetIncludeParent !== null
-                ? datasetIncludeParent
-                : projectSettings && Object.prototype.hasOwnProperty.call(projectSettings, 'includeParent')
-                    ? parseBooleanFlag(projectSettings.includeParent)
-                    : false;
+
 
         return {
             enabled,
+            tableOnly,
             scope,
-            includeParent,
         };
     };
 
-    const buildHierarchyMaps = (project, ancestors, scope) => {
-        const base = scope === 'hierarchy' && Array.isArray(ancestors) && ancestors.length
-            ? [...ancestors, project]
-            : [project];
+    const buildHierarchyRows = (project, linkedProjects) => {
+        const rows = [];
         const seen = new Set();
-        return base
-            .filter((entry) => entry && typeof entry === 'object')
-            .filter((entry) => {
-                const id = entry.id ? String(entry.id).toLowerCase() : '';
-                if (!id) {
-                    return true;
+
+
+
+        const resolveMapName = (map) =>
+            String(
+                map?.name ??
+                map?.title ??
+                map?.label ??
+                map?.publicKey ??
+                map?.shortcode ??
+                'Mapa',
+            ).trim();
+
+        const pushFloor = (floor, source, parentName) => {
+            if (!floor || typeof floor !== 'object') {
+                return;
+            }
+            const key = buildFloorKey(floor);
+            if (key) {
+                if (seen.has(key)) {
+                    return;
                 }
-                if (seen.has(id)) {
-                    return false;
-                }
-                seen.add(id);
-                return true;
+                seen.add(key);
+            }
+            rows.push({
+                floor,
+                source,
+                parentName: parentName || '',
             });
+        };
+
+        // Helper to extract location entries from region children
+        const extractLocationsFromRegions = (regions) => {
+            const locations = [];
+            if (!Array.isArray(regions)) {
+                return locations;
+            }
+            regions.forEach((region) => {
+                if (!region || typeof region !== 'object') {
+                    return;
+                }
+                const children = Array.isArray(region.children) ? region.children : [];
+                children.forEach((child) => {
+                    if (!child || typeof child !== 'object') {
+                        return;
+                    }
+                    // Check if child is a location (not a map reference)
+                    const childType = String(child.type ?? child.kind ?? child.nodeType ?? '').toLowerCase();
+                    if (childType === 'map' || childType === 'project') {
+                        return; // Skip map references
+                    }
+                    // Treat as location data
+                    const locationData = {
+                        id: child.id ?? child.target ?? child.value,
+                        name: child.name ?? child.label ?? child.title ?? '',
+                        designation: child.designation ?? child.shortcode ?? '',
+                        type: child.type ?? child.kind ?? 'Lokalita',
+                        statusId: child.statusId ?? child.status ?? '',
+                        statusLabel: child.statusLabel ?? '',
+                        area: child.area ?? '',
+                        price: child.price ?? '',
+                        rent: child.rent ?? '',
+                        detailUrl: child.detailUrl ?? child.url ?? '',
+                        ...child, // Include all other fields
+                    };
+                    if (locationData.id || locationData.name) {
+                        locations.push(locationData);
+                    }
+                });
+            });
+            return locations;
+        };
+
+        // Process current project floors
+        const currentFloors = Array.isArray(project?.floors) ? project.floors : [];
+
+        currentFloors.forEach((floor) => pushFloor(floor, 'current', ''));
+
+        // If project has no floors, try to extract from regions
+        if (!currentFloors.length && Array.isArray(project?.regions)) {
+            const regionLocations = extractLocationsFromRegions(project.regions);
+
+            regionLocations.forEach((loc) => pushFloor(loc, 'current', ''));
+        }
+
+        // Process linked projects
+        const linked = Array.isArray(linkedProjects) ? linkedProjects : [];
+        linked.forEach((mapEntry) => {
+            const mapName = resolveMapName(mapEntry);
+            const floors = Array.isArray(mapEntry?.floors) ? mapEntry.floors : [];
+
+
+
+            if (floors.length) {
+                floors.forEach((floor) => pushFloor(floor, 'parent', mapName));
+            } else if (Array.isArray(mapEntry?.regions)) {
+                // Try to extract locations from regions if no floors
+                const regionLocations = extractLocationsFromRegions(mapEntry.regions);
+
+                regionLocations.forEach((loc) => pushFloor(loc, 'parent', mapName));
+            }
+        });
+
+
+        return rows;
+    };
+
+    const mergeStatuses = (baseStatuses, ...statusLists) => {
+        const result = [];
+        const seen = new Set();
+        const pushStatus = (status) => {
+            if (!status || typeof status !== 'object') {
+                return;
+            }
+            const key = String(status.id ?? status.key ?? '').trim();
+            if (!key) {
+                return;
+            }
+            if (seen.has(key)) {
+                return;
+            }
+            seen.add(key);
+            result.push(status);
+        };
+        (Array.isArray(baseStatuses) ? baseStatuses : []).forEach(pushStatus);
+        statusLists.forEach((list) => {
+            (Array.isArray(list) ? list : []).forEach(pushStatus);
+        });
+        return result;
     };
 
     const buildTableRows = (currentFloors, parentFloors, parentName) => {
@@ -855,34 +984,29 @@
                 const status = resolveStatusDisplay(floor, statuses);
                 const statusVariant = escapeHtml(status.variant || 'unknown');
                 const statusLabel = escapeHtml(status.label || 'Neznáme');
+                const statusColor = status.color || '#6366f1';
+                const statusBgColor = toRgba(statusColor, 0.15);
                 const detailUrl = normaliseUrl(
                     floor.detailUrl ??
-                        floor.url ??
-                        (floor.meta && (floor.meta.detailUrl ?? floor.meta.url)) ??
-                        '',
+                    floor.url ??
+                    (floor.meta && (floor.meta.detailUrl ?? floor.meta.url)) ??
+                    '',
                 );
                 const nameValue = floor.name ?? floor.label ?? floor.designation ?? '—';
                 const nameMarkup = detailUrl
                     ? `<a class="dm-dashboard__link" href="${escapeHtml(detailUrl)}">${escapeHtml(nameValue)}</a>`
                     : `<span class="dm-dashboard__text">${escapeHtml(nameValue)}</span>`;
-                const parentTag =
-                    entry.source === 'parent'
-                        ? `<span class="dm-dashboard__parent-tag">${
-                              entry.parentName
-                                  ? `Mapa ${escapeHtml(entry.parentName)}`
-                                  : 'Nadradená mapa'
-                          }</span>`
-                        : '';
+
                 return `
                     <tr role="row">
                         <td role="cell" data-label="Typ">${typeValue}</td>
-                        <td role="cell" data-label="Názov">${nameMarkup}${parentTag}</td>
+                        <td role="cell" data-label="Názov">${nameMarkup}</td>
                         <td role="cell" data-label="Označenie">${designation}</td>
                         <td role="cell" data-label="Rozloha">${areaText}</td>
                         <td role="cell" data-label="Cena">${priceText}</td>
                         <td role="cell" data-label="Prenájom">${rentText}</td>
                         <td role="cell" data-label="Stav">
-                            <span class="dm-status dm-status--${statusVariant}">${statusLabel}</span>
+                            <span class="dm-status" style="background:${escapeHtml(statusBgColor)}; color:${escapeHtml(statusColor)};">${statusLabel}</span>
                         </td>
                     </tr>
                 `;
@@ -985,10 +1109,7 @@
                 });
             }
             renderTableRows(tbody, dataset, statuses);
-            if (summaryEl) {
-                const count = dataset.length;
-                summaryEl.textContent = count ? `${count} ${formatCountLabel(count)}` : 'Žiadne lokality';
-            }
+
         };
 
         if (searchInput) {
@@ -1015,14 +1136,12 @@
         applyFilters();
     };
 
-    const createMapTableElement = ({ map, statuses, includeParent, isCurrent }) => {
+    const createMapTableElement = ({ map, statuses, isCurrent, rows }) => {
         const floors = Array.isArray(map?.floors) ? map.floors : [];
-        const parentFloors = includeParent && Array.isArray(includeParent.floors) ? includeParent.floors : [];
-        const parentName = includeParent?.name ?? includeParent?.title ?? includeParent?.label ?? '';
-        const rows = buildTableRows(floors, parentFloors, parentName);
+        const resolvedRows = Array.isArray(rows) ? rows : buildTableRows(floors, [], '');
         const resolvedStatuses = Array.isArray(statuses) ? statuses : [];
         const statusOptions = [
-            '<option value="">Všetky stavy</option>',
+            '<option value="">NEROZHODUJE</option>',
             ...(Array.isArray(statuses) ? statuses : [])
                 .map((status) => {
                     const key = status?.id ?? status?.key ?? '';
@@ -1035,28 +1154,21 @@
                 })
                 .filter(Boolean),
         ].join('');
-        const legendEntries = buildLegendEntries(rows, resolvedStatuses);
-        const legendMarkup = legendEntries.length
+        const legendMarkup = resolvedStatuses.length
             ? `<div class="dm-dashboard__legend dm-dashboard__legend--public" role="list">
                     <span class="dm-dashboard__legend-heading" aria-hidden="true">Legenda stavov</span>
-                    ${legendEntries
-                        .map((entry) => {
-                            const accent = entry.color || STATUS_FALLBACK_COLOR;
-                            const background = toRgba(accent, 0.18);
-                            const border = toRgba(accent, 0.32);
-                            const halo = toRgba(accent, 0.15);
-                            return `
-                                <span class="dm-dashboard__legend-badge" role="listitem" style="background:${escapeHtml(
-                                    background,
-                                )}; border-color:${escapeHtml(border)}; color:${escapeHtml(accent)};">
-                                    <span class="dm-dashboard__legend-dot" aria-hidden="true" style="background:${escapeHtml(
-                                        accent,
-                                    )}; box-shadow:0 0 0 4px ${escapeHtml(halo)};"></span>
-                                    ${escapeHtml(entry.label)}
+                    ${resolvedStatuses
+                .map((status) => {
+                    const label = status?.label ?? 'Neznáme';
+                    const color = status?.color || '#6366f1';
+                    const bgColor = toRgba(color, 0.15);
+                    return `
+                                <span class="dm-dashboard__legend-badge" role="listitem" style="background:${escapeHtml(bgColor)}; color:${escapeHtml(color)};">
+                                    ${escapeHtml(label)}
                                 </span>
                             `;
-                        })
-                        .join('')}
+                })
+                .join('')}
                 </div>`
             : '';
 
@@ -1069,24 +1181,20 @@
         const priceNativeId = `${instanceId}-price-native`;
         const section = document.createElement('section');
         section.className = 'dm-dashboard dm-dashboard--public';
-        const mapName =
-            map?.name ?? map?.title ?? map?.label ?? map?.publicKey ?? map?.shortcode ?? 'Mapa';
-        const noteText = includeParent ? `Vrátane lokalít mapy ${escapeHtml(parentName || mapName)}` : '';
         section.innerHTML = `
             <div class="dm-dashboard__card">
-                <div class="dm-dashboard__heading">
-                    <h1>${escapeHtml(mapName)}</h1>
-                    <p>${escapeHtml(isCurrent ? 'Aktuálna mapa' : 'Mapa v hierarchii')}</p>
-                </div>
                 <div class="dm-dashboard__toolbar" role="search">
-                    <label class="dm-dashboard__search">
-                        <span class="dm-dashboard__search-icon" aria-hidden="true">${DASHBOARD_ICONS.search}</span>
-                        <input type="search" placeholder="Vyhľadať lokalitu" data-role="search" aria-label="Vyhľadať lokalitu" />
-                    </label>
+                    <div class="dm-dashboard__search-wrapper">
+                        <span class="dm-dashboard__search-label">Vyhľadávanie</span>
+                        <label class="dm-dashboard__search">
+                            <img class="dm-dashboard__search-icon" src="data:image/svg+xml,%3Csvg width='19' height='19' viewBox='0 0 19 19' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.7088 17.0928L14.4016 12.7856C15.4386 11.4052 15.9984 9.72482 15.9965 7.99824C15.9965 3.58804 12.4084 0 7.99824 0C3.58804 0 0 3.58804 0 7.99824C0 12.4084 3.58804 15.9965 7.99824 15.9965C9.72482 15.9984 11.4052 15.4386 12.7856 14.4016L17.0928 18.7088C17.3109 18.9037 17.5952 19.0077 17.8876 18.9996C18.1799 18.9914 18.458 18.8716 18.6648 18.6648C18.8716 18.458 18.9914 18.1799 18.9996 17.8876C19.0077 17.5952 18.9037 17.3109 18.7088 17.0928ZM2.28521 7.99824C2.28521 6.86831 2.62027 5.76375 3.24803 4.82425C3.87579 3.88475 4.76804 3.1525 5.81196 2.72009C6.85588 2.28768 8.00458 2.17455 9.1128 2.39499C10.221 2.61542 11.239 3.15954 12.038 3.95852C12.8369 4.7575 13.3811 5.77546 13.6015 6.88368C13.8219 7.9919 13.7088 9.1406 13.2764 10.1845C12.844 11.2284 12.1117 12.1207 11.1722 12.7484C10.2327 13.3762 9.12817 13.7113 7.99824 13.7113C6.48361 13.7094 5.03153 13.107 3.96053 12.036C2.88952 10.9649 2.28703 9.51287 2.28521 7.99824Z' fill='%237A768C'/%3E%3C/svg%3E" alt="" aria-hidden="true" />
+                            <input type="search" placeholder="Vyhľadať lokalitu" data-role="search" aria-label="Vyhľadať lokalitu" />
+                        </label>
+                    </div>
                     <div class="dm-dashboard__select" data-role="status-filter-wrapper">
                         <span class="dm-dashboard__select-label" id="${statusLabelId}">Stav</span>
                         <button type="button" class="dm-dashboard__select-trigger" data-role="status-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="${statusLabelId} ${statusValueId}">
-                            <span class="dm-dashboard__select-value" data-role="status-value" id="${statusValueId}">Všetky stavy</span>
+                            <span class="dm-dashboard__select-value" data-role="status-value" id="${statusValueId}">NEROZHODUJE</span>
                             <span class="dm-dashboard__select-icon" aria-hidden="true"></span>
                         </button>
                         <div class="dm-dashboard__select-dropdown" data-role="status-dropdown" role="listbox" aria-labelledby="${statusLabelId}" hidden>
@@ -1099,14 +1207,14 @@
                     <div class="dm-dashboard__select" data-role="price-filter-wrapper">
                         <span class="dm-dashboard__select-label" id="${priceLabelId}">Cena</span>
                         <button type="button" class="dm-dashboard__select-trigger" data-role="price-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="${priceLabelId} ${priceValueId}">
-                            <span class="dm-dashboard__select-value" data-role="price-value" id="${priceValueId}">Všetky ceny</span>
+                            <span class="dm-dashboard__select-value" data-role="price-value" id="${priceValueId}">NEROZHODUJE</span>
                             <span class="dm-dashboard__select-icon" aria-hidden="true"></span>
                         </button>
                         <div class="dm-dashboard__select-dropdown" data-role="price-dropdown" role="listbox" aria-labelledby="${priceLabelId}" hidden>
                             <div class="dm-dashboard__select-dropdown-inner" data-role="price-dropdown-inner"></div>
                         </div>
                         <select id="${priceNativeId}" class="dm-dashboard__select-native" data-role="price-filter" aria-labelledby="${priceLabelId}" tabindex="-1" aria-hidden="true">
-                            <option value="">Všetky ceny</option>
+                            <option value="">NEROZHODUJE</option>
                             <option value="asc">Najnižšia</option>
                             <option value="desc">Najvyššia</option>
                         </select>
@@ -1114,7 +1222,6 @@
                 </div>
                 ${legendMarkup}
                 <div class="dm-dashboard__summary" data-role="table-summary"></div>
-                <p class="dm-dashboard__heading-note" data-role="parent-note"${noteText ? '' : ' hidden'}>${noteText}</p>
                 <div class="dm-dashboard__table-wrapper">
                     <table class="dm-dashboard__table" role="table">
                         <thead>
@@ -1136,7 +1243,7 @@
 
         createTableController({
             root: section,
-            rows,
+            rows: resolvedRows,
             statuses: resolvedStatuses,
         });
 
@@ -1145,36 +1252,104 @@
         return section;
     };
 
-    const renderLocationTables = ({ root, project, ancestors, preferences, statuses }) => {
+    const renderLocationTables = ({
+        root,
+        project,
+        linkedProjects,
+        hierarchyProjects,
+        preferences,
+        statuses,
+        accentColor,
+        accentRgb,
+    }) => {
         if (!root || !preferences?.enabled) {
             return;
         }
-        const maps = buildHierarchyMaps(project, ancestors, preferences.scope);
-        if (!maps.length) {
+        const scope = preferences.scope === 'hierarchy' ? 'hierarchy' : 'current';
+        const baseStatuses = Array.isArray(project?.palette?.statuses) ? project.palette.statuses : statuses;
+
+        if (scope === 'hierarchy') {
+
+
+            const getProjectId = (entry) =>
+                String(entry?.id ?? entry?.projectId ?? entry?.uuid ?? entry?.shortcode ?? entry?.publicKey ?? '')
+                    .trim()
+                    .toLowerCase();
+
+            const currentProjectId = getProjectId(project);
+
+            const combined = [
+                ...(Array.isArray(hierarchyProjects) ? hierarchyProjects : []),
+                ...(Array.isArray(linkedProjects) ? linkedProjects : []),
+            ].filter((entry) => entry && typeof entry === 'object');
+
+            const unique = [];
+            const seen = new Set();
+            combined.forEach((entry) => {
+                const id = getProjectId(entry);
+                if (!id) {
+                    unique.push(entry);
+                    return;
+                }
+                if (seen.has(id)) {
+                    return;
+                }
+                seen.add(id);
+                unique.push(entry);
+            });
+
+            const relatedMaps = unique.filter((entry) => {
+                const id = getProjectId(entry);
+                if (!id || !currentProjectId) {
+                    return entry !== project;
+                }
+                return id !== currentProjectId;
+            });
+
+            const rows = buildHierarchyRows(project, relatedMaps);
+            const mergedStatuses = mergeStatuses(
+                baseStatuses,
+                ...relatedMaps.map((entry) =>
+                    Array.isArray(entry?.palette?.statuses) ? entry.palette.statuses : [],
+                ),
+            );
+
+            const tableEl = createMapTableElement({
+                map: project,
+                statuses: mergedStatuses,
+                isCurrent: true,
+                rows,
+            });
+            if (!tableEl) {
+                root.remove();
+                return;
+            }
+            if (accentColor) {
+                tableEl.style.setProperty('--dm-accent', accentColor);
+            }
+            if (accentRgb) {
+                tableEl.style.setProperty('--dm-accent-rgb', accentRgb);
+            }
+            root.appendChild(tableEl);
             return;
         }
-        const parentForCurrent = ancestors.length ? ancestors[ancestors.length - 1] : null;
-        let rendered = 0;
-        maps.forEach((mapEntry) => {
-            const mapStatuses = Array.isArray(mapEntry?.palette?.statuses)
-                ? mapEntry.palette.statuses
-                : statuses;
-            const includeParent =
-                preferences.includeParent && mapEntry === project ? parentForCurrent : null;
-            const tableEl = createMapTableElement({
-                map: mapEntry,
-                statuses: mapStatuses,
-                includeParent,
-                isCurrent: mapEntry === project,
-            });
-            if (tableEl) {
-                root.appendChild(tableEl);
-                rendered += 1;
-            }
+
+        const tableEl = createMapTableElement({
+            map: project,
+            statuses: baseStatuses,
+            isCurrent: true,
         });
-        if (!rendered) {
+        if (!tableEl) {
             root.remove();
+            return;
         }
+        if (accentColor) {
+            tableEl.style.setProperty('--dm-accent', accentColor);
+        }
+        if (accentRgb) {
+            tableEl.style.setProperty('--dm-accent-rgb', accentRgb);
+        }
+        root.appendChild(tableEl);
     };
 
     async function renderMap(container) {
@@ -1205,7 +1380,7 @@
                 console.warn('[Developer Map] Standard REST API endpoint failed, trying alternative endpoint...');
                 const pluginUrl = window.location.origin + '/wp-content/plugins/developer-map';
                 const alternativeUrl = `${pluginUrl}/get-project.php?public_key=${encodeURIComponent(key)}`;
-                
+
                 response = await fetch(withCacheBusting(alternativeUrl), {
                     credentials: 'same-origin',
                     headers: {
@@ -1223,6 +1398,8 @@
             const payload = await response.json();
             const project = payload?.project;
             const ancestors = Array.isArray(payload?.ancestors) ? payload.ancestors : [];
+            const linkedProjects = Array.isArray(payload?.linkedProjects) ? payload.linkedProjects : [];
+            const hierarchyProjects = Array.isArray(payload?.hierarchyProjects) ? payload.hierarchyProjects : [];
 
             if (!project || typeof project !== 'object') {
                 throw new Error('Missing project payload');
@@ -1270,12 +1447,18 @@
                 console.warn('[Developer Map] Missing image URL for project:', key);
                 console.log('[Developer Map] Project data:', project);
             }
-            
+
             const rendererOptions = project.renderer ?? {};
             const viewbox = rendererOptions.size ?? { width: 1280, height: 720 };
             const regions = Array.isArray(project.regions) ? project.regions : [];
             const statuses = Array.isArray(project?.palette?.statuses) ? project.palette.statuses : [];
             const tablePreferences = resolveTablePreferences(container, project);
+
+            // Apply frontend accent color from API response
+            const accentColor = payload?.frontendAccentColor ?? '#4d38ff';
+            const accentRgb = hexToRgb(accentColor);
+            container.style.setProperty('--dm-accent', accentColor);
+            container.style.setProperty('--dm-accent-rgb', accentRgb);
 
             const lookupStatus = (statusId) => {
                 const sought = String(statusId ?? '').trim();
@@ -1320,12 +1503,12 @@
 
             // Zobraz iba interaktívny obrázok bez zoznamu lokalít
             container.innerHTML = `
-                <div class="dm-map-viewer__surface">
+                ${!tablePreferences.tableOnly ? `<div class="dm-map-viewer__surface">
                     ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" class="dm-map-viewer__image" />` : '<p class="dm-map-viewer__error">Chýba obrázok mapy. Nahrajte obrázok v administrácii.</p>'}
                     ${imageUrl ? `<svg class="dm-map-viewer__overlay" viewBox="0 0 ${escapeHtml(String(baseWidth))} ${escapeHtml(String(baseHeight))}" aria-hidden="true">
                         <g class="dm-map-viewer__regions">${polygonsMarkup}</g>
                     </svg>` : ''}
-                </div>
+                </div>` : ''}
                 ${tablePreferences.enabled ? '<div class="dm-map-viewer__tables" data-role="dm-map-tables"></div>' : ''}
             `;
 
@@ -1339,11 +1522,19 @@
                     renderLocationTables({
                         root: tableRoot,
                         project,
-                        ancestors,
+                        linkedProjects,
+                        hierarchyProjects,
                         preferences: tablePreferences,
                         statuses,
+                        accentColor,
+                        accentRgb,
                     });
                 }
+            }
+
+            if (tablePreferences.tableOnly) {
+                // Ak je zapnutý režim "iba tabuľka", preskoč inicializáciu mapy
+                return;
             }
 
             if (!surface || !overlay) {
@@ -1432,7 +1623,6 @@
             };
             traversePayload(project);
 
-            const linkedProjects = Array.isArray(payload?.linkedProjects) ? payload.linkedProjects : [];
             linkedProjects.forEach((linkedProject) => {
                 traversePayload(linkedProject);
             });
@@ -1537,14 +1727,14 @@
                 }
                 const canonicalKey = sanitiseId(
                     floor.id ??
-                        floor.floorId ??
-                        floor.uuid ??
-                        floor.slug ??
-                        floor.shortcode ??
-                        floor.identifier ??
-                        floor.externalId ??
-                        floor.externalID ??
-                        '',
+                    floor.floorId ??
+                    floor.uuid ??
+                    floor.slug ??
+                    floor.shortcode ??
+                    floor.identifier ??
+                    floor.externalId ??
+                    floor.externalID ??
+                    '',
                 );
                 if (canonicalKey && floorById.has(canonicalKey)) {
                     return floorById.get(canonicalKey);
@@ -1648,12 +1838,12 @@
 
                     const statusIdCandidate = sanitiseId(
                         region.statusId ??
-                            region.status ??
-                            region.paletteStatus ??
-                            region.meta?.status ??
-                            region.meta?.statusId ??
-                            region.meta?.paletteStatus ??
-                            '',
+                        region.status ??
+                        region.paletteStatus ??
+                        region.meta?.status ??
+                        region.meta?.statusId ??
+                        region.meta?.paletteStatus ??
+                        '',
                     );
                     const labelCandidateRaw =
                         region.statusLabel ??
@@ -1672,8 +1862,8 @@
 
                     const hasStatusInfo = Boolean(
                         statusIdCandidate ||
-                            (typeof region.status === 'string' && region.status.trim() !== '') ||
-                            labelCandidate,
+                        (typeof region.status === 'string' && region.status.trim() !== '') ||
+                        labelCandidate,
                     );
 
                     if (!hasStatusInfo) {
@@ -2396,6 +2586,13 @@
                 return;
             }
             container.dataset.dmMapHydrated = '1';
+
+            const accentColor = container.dataset.dmAccentColor;
+            if (accentColor) {
+                container.style.setProperty('--dm-accent', accentColor);
+                container.style.setProperty('--dm-accent-rgb', hexToRgb(accentColor));
+            }
+
             void renderMap(container);
         });
     }
