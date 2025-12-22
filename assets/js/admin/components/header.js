@@ -23,15 +23,15 @@ const [{ APP_VIEWS }, { escapeHtml }] = await Promise.all([
 const PLUGIN_VERSION = '0.5.0';
 
 const getBrandIcons = (base) => ({
-    logo: `<img src="${base}/../../images/Logo.svg" alt="Logo" style="display: block; width: auto; height: clamp(32px, 5vw, 48px);" />`,
+    logo: `<img src="${base}/../../icons/Logo.svg" alt="Logo" style="display: block; width: auto; height: clamp(32px, 5vw, 48px);" />`,
     mark: ``
 });
 
 
 const getNavIcons = (base) => ({
-    settings: `<img src="${base}/../../images/icons/Settings_btn.svg" width="24" height="24" alt="Settings" />`,
-    docs: `<img src="${base}/../../images/icons/Docs_btn.svg" width="24" height="24" alt="Docs" />`,
-    search: `<img src="${base}/../../images/icons/Search.svg" width="24" height="24" alt="Search" />`,
+    settings: `<img src="${base}/../../icons/Settings_btn.svg" width="24" height="24" alt="Settings" />`,
+    docs: `<img src="${base}/../../icons/Docs_btn.svg" width="24" height="24" alt="Docs" />`,
+    search: `<img src="${base}/../../icons/Search.svg" width="24" height="24" alt="Search" />`,
 });
 
 export function renderHeader(state, assetsBase) {
