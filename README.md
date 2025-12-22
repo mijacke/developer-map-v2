@@ -40,7 +40,7 @@ developer-map-v2/
     ├── css/
     ├── js/admin/     # Admin dashboard
     ├── js/frontend/  # Map viewer
-    └── images/icons/
+    └── icons/
 ```
 
 ## Verzia
