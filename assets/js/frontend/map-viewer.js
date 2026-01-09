@@ -429,6 +429,8 @@
             .dm-dashboard--public .dm-dashboard__legend-badge--unknown { background: rgba(124, 58, 237, 0.12); color: rgba(45, 45, 78, 0.65); }
             .dm-dashboard--public .dm-dashboard__legend-dot { width: 10px; height: 10px; border-radius: 50%; }
             .dm-dashboard--public .dm-dashboard__legend--public { justify-content: flex-start; }
+            .dm-dashboard--public .dm-dashboard__info-notice { display: flex; align-items: center; gap: 10px; padding: 12px 16px; margin-top: 8px; background: linear-gradient(135deg, rgba(var(--dm-accent-rgb, 77, 56, 255), 0.08) 0%, rgba(var(--dm-accent-rgb, 77, 56, 255), 0.04) 100%); border-radius: 12px; border: 1px solid rgba(var(--dm-accent-rgb, 77, 56, 255), 0.18); color: var(--dm-accent, #4d38ff); font-size: 0.9rem; font-weight: 500; }
+            .dm-dashboard--public .dm-dashboard__info-notice-icon { width: 20px; height: 20px; flex-shrink: 0; color: var(--dm-accent, #4d38ff); }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table thead { display: none; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table tbody tr { display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(28, 19, 79, 0.08); border-radius: 18px; padding: 18px 18px; background: #ffffff; }
             .dm-dashboard--public.dm-dashboard--stacked .dm-dashboard__table td { width: 100%; display: flex; justify-content: space-between; align-items: center; white-space: normal; background: transparent; }
@@ -1169,6 +1171,12 @@
                             `;
                 })
                 .join('')}
+                </div>
+                <div class="dm-dashboard__info-notice" role="note">
+                    <svg class="dm-dashboard__info-notice-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+                    </svg>
+                    <span>Ku každému bytu je nutné zakúpiť garážové státie.</span>
                 </div>`
             : '';
 
@@ -2110,7 +2118,7 @@
             const positiveFillColor = '#1f8b4e';
             const reservedFillColor = '#f97316';
             const negativeFillColor = '#c53030';
-            const neutralFillColor = '#62718d';
+            const neutralFillColor = '#4a5568'; // Stronger gray-blue for "pripravujeme"
             const idleAlpha = 0.45;
             const hoverAlpha = 0.68;
             const selectedAlpha = 0.68; // Same as hover - not too strong
@@ -2120,7 +2128,7 @@
             const idleOpacity = 0.55;
             const hoverOpacity = 0.75;
             const selectedOpacity = 0.75; // Same as hover
-            const headlinePreparingColor = '#64748b';
+            const headlinePreparingColor = '#4a5568'; // Match the fill color
             const headlineDefaultColor = '#1c134f';
 
             const sanitiseColorValue = (value, fallback) => {
@@ -2152,9 +2160,9 @@
                     headline: 'Pripravujeme',
                     headlineColor: headlinePreparingColor,
                     fillColor: neutralFillColor,
-                    alphaBoost: 0,
-                    strokeBoost: 0,
-                    opacityBoost: 0,
+                    alphaBoost: 0.18, // Make "pripravujeme" more visible
+                    strokeBoost: 0.15,
+                    opacityBoost: 0.20,
                 };
 
                 if (!summary || !Array.isArray(summary.entries) || summary.entries.length === 0) {
