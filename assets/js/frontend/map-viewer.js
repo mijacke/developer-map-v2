@@ -404,7 +404,8 @@
             .dm-dashboard--public .dm-dashboard__table td { border: none !important; box-shadow: none !important; background: transparent; text-align: center; }
             .dm-dashboard--public .dm-dashboard__table th { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; color: rgba(45, 45, 78, 0.6); }
             .dm-dashboard--public .dm-dashboard__table tbody { display: flex; flex-direction: column; gap: 0; }
-            .dm-dashboard--public .dm-dashboard__table tbody tr { padding: 18px 0; border-bottom: 1px solid rgba(28, 19, 79, 0.06); background: transparent; }
+            .dm-dashboard--public .dm-dashboard__table tbody tr { padding: 18px 0; border-bottom: 1px solid rgba(28, 19, 79, 0.06); background: transparent; transition: background-color 0.2s ease; }
+            .dm-dashboard--public .dm-dashboard__table tbody tr.dm-dashboard__clickable-row:hover { background: rgba(var(--dm-accent-rgb, 77, 56, 255), 0.06); }
             .dm-dashboard--public .dm-dashboard__table tbody tr:last-child { border-bottom: none; }
             .dm-dashboard--public .dm-dashboard__table td { font-size: 0.95rem; color: #1C134F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .dm-dashboard--public .dm-dashboard__link { color: #1C134F; font-weight: 600; text-decoration: none; }
@@ -442,12 +443,19 @@
             }
             @media (max-width: 900px) {
                 .dm-dashboard--public .dm-dashboard__table thead { display: none; }
-                .dm-dashboard--public .dm-dashboard__table tbody tr { display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(28, 19, 79, 0.08); border-radius: 18px; padding: 18px 18px; background: #ffffff; }
-                .dm-dashboard--public .dm-dashboard__table td { width: 100%; display: flex; justify-content: space-between; align-items: center; white-space: normal; background: transparent; }
-                .dm-dashboard--public .dm-dashboard__table td::before { content: attr(data-label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(45, 45, 78, 0.6); margin-right: 12px; }
+                .dm-dashboard--public .dm-dashboard__table tbody { gap: 16px; }
+                .dm-dashboard--public .dm-dashboard__table tbody tr { display: flex; flex-direction: column; gap: 6px; border: 1px solid rgba(28, 19, 79, 0.08); border-radius: 14px; padding: 14px 16px; background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); }
+                .dm-dashboard--public .dm-dashboard__table tbody tr.dm-dashboard__clickable-row:hover { background: rgba(var(--dm-accent-rgb, 77, 56, 255), 0.04); box-shadow: 0 2px 8px rgba(var(--dm-accent-rgb, 77, 56, 255), 0.1); }
+                .dm-dashboard--public .dm-dashboard__table td { width: 100%; display: flex; justify-content: space-between; align-items: center; white-space: normal; background: transparent; padding: 4px 0; font-size: 0.9rem; }
+                .dm-dashboard--public .dm-dashboard__table td::before { content: attr(data-label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; color: rgba(45, 45, 78, 0.5); margin-right: 12px; flex-shrink: 0; }
             }
             @media (max-width: 640px) {
                 .dm-dashboard--public .dm-dashboard__toolbar { grid-template-columns: 1fr; }
+                .dm-dashboard--public .dm-dashboard__table tbody { gap: 12px; }
+                .dm-dashboard--public .dm-dashboard__table tbody tr { gap: 4px; padding: 12px 14px; border-radius: 12px; }
+                .dm-dashboard--public .dm-dashboard__table td { padding: 3px 0; font-size: 0.85rem; }
+                .dm-dashboard--public .dm-dashboard__table td::before { font-size: 0.7rem; }
+                .dm-dashboard--public .dm-status { padding: 5px 12px; font-size: 0.8rem; }
             }
         `;
         document.head.appendChild(style);
@@ -973,6 +981,40 @@
                 '<tr class="dm-dashboard__empty-row"><td colspan="7">Žiadne lokality nevyhovujú filtrom.</td></tr>';
             return;
         }
+
+        // Helper to generate detail URL based on type and name
+        const generateDetailUrl = (floor) => {
+            const type = (floor.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const name = floor.name || floor.label || floor.designation || '';
+
+            // Extract the code from name (e.g., "Byt - 101A" -> "101A", or "Garáž - 201" -> "201")
+            let code = name;
+            if (name.includes('-')) {
+                code = name.split('-').pop().trim();
+            } else if (name.includes(' ')) {
+                // Try to get just the number/code part
+                const parts = name.split(' ');
+                code = parts[parts.length - 1].trim();
+            }
+
+            // Determine URL prefix based on type
+            let urlPrefix = '';
+            if (type === 'byt' || type.startsWith('byt')) {
+                urlPrefix = 'byt';
+            } else if (type === 'garaz' || type.startsWith('garaz')) {
+                urlPrefix = 'garaz';
+            } else {
+                // Fallback - use type directly
+                urlPrefix = type.replace(/[^a-z0-9]/g, '');
+            }
+
+            if (!urlPrefix || !code) {
+                return '';
+            }
+
+            return `https://vyhladyzubrohlava.sk/${urlPrefix}-${code}/`;
+        };
+
         const markup = dataset
             .map((entry) => {
                 const floor = entry.floor || {};
@@ -988,19 +1030,30 @@
                 const statusLabel = escapeHtml(status.label || 'Neznáme');
                 const statusColor = status.color || '#6366f1';
                 const statusBgColor = toRgba(statusColor, 0.15);
-                const detailUrl = normaliseUrl(
+
+                const nameValue = floor.name ?? floor.label ?? floor.designation ?? '—';
+
+                // Don't make rows clickable if name is missing (—)
+                const hasValidName = nameValue && nameValue !== '—';
+
+                // Use existing detailUrl or generate one based on type and name (only for valid names)
+                const detailUrl = hasValidName ? (normaliseUrl(
                     floor.detailUrl ??
                     floor.url ??
                     (floor.meta && (floor.meta.detailUrl ?? floor.meta.url)) ??
                     '',
-                );
-                const nameValue = floor.name ?? floor.label ?? floor.designation ?? '—';
+                ) || generateDetailUrl(floor)) : '';
+
                 const nameMarkup = detailUrl
                     ? `<a class="dm-dashboard__link" href="${escapeHtml(detailUrl)}">${escapeHtml(nameValue)}</a>`
                     : `<span class="dm-dashboard__text">${escapeHtml(nameValue)}</span>`;
 
+                const rowClickAttr = detailUrl
+                    ? `class="dm-dashboard__clickable-row" data-href="${escapeHtml(detailUrl)}" style="cursor: pointer;"`
+                    : '';
+
                 return `
-                    <tr role="row">
+                    <tr role="row" ${rowClickAttr}>
                         <td role="cell" data-label="Typ">${typeValue}</td>
                         <td role="cell" data-label="Názov">${nameMarkup}</td>
                         <td role="cell" data-label="Označenie">${designation}</td>
@@ -1015,6 +1068,20 @@
             })
             .join('');
         tbody.innerHTML = markup;
+
+        // Add click handlers for clickable rows
+        tbody.querySelectorAll('.dm-dashboard__clickable-row').forEach((row) => {
+            row.addEventListener('click', (event) => {
+                // Don't navigate if clicking on a link directly
+                if (event.target.tagName === 'A') {
+                    return;
+                }
+                const href = row.dataset.href;
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
     };
 
     const createTableController = ({ root, rows, statuses }) => {
@@ -1093,9 +1160,61 @@
                     (entry) => resolveStatusId(entry.floor, statuses) === state.statusFilter,
                 );
             }
+
+            // Helper to check if status is "Zrušené" (cancelled)
+            const isCancelled = (entry) => {
+                const statusDisplay = resolveStatusDisplay(entry.floor, statuses);
+                const label = (statusDisplay.label || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                return label === 'zrusene' || label.includes('zrusen');
+            };
+
+            // Helper to get type priority: Byt = 0, Garáž = 1, others = 2
+            const getTypePriority = (entry) => {
+                const type = (entry.floor?.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                if (type === 'byt' || type.startsWith('byt')) {
+                    return 0;
+                }
+                if (type === 'garaz' || type.startsWith('garaz')) {
+                    return 1;
+                }
+                return 2;
+            };
+
+            // Helper to get sortable name
+            const getSortName = (entry) => {
+                return (entry.floor?.name || entry.floor?.label || entry.floor?.designation || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            };
+
+            dataset = [...dataset].sort((a, b) => {
+                // 1. Cancelled items go to the end
+                const aCancelled = isCancelled(a) ? 1 : 0;
+                const bCancelled = isCancelled(b) ? 1 : 0;
+                if (aCancelled !== bCancelled) {
+                    return aCancelled - bCancelled;
+                }
+
+                // 2. Sort by type: Byt before Garáž
+                const aTypePriority = getTypePriority(a);
+                const bTypePriority = getTypePriority(b);
+                if (aTypePriority !== bTypePriority) {
+                    return aTypePriority - bTypePriority;
+                }
+
+                // 3. Alphabetical by name
+                const aName = getSortName(a);
+                const bName = getSortName(b);
+                return aName.localeCompare(bName, 'sk');
+            });
+
             if (state.priceOrder === 'asc' || state.priceOrder === 'desc') {
                 const direction = state.priceOrder === 'asc' ? 1 : -1;
                 dataset = [...dataset].sort((a, b) => {
+                    const aCancelled = isCancelled(a) ? 1 : 0;
+                    const bCancelled = isCancelled(b) ? 1 : 0;
+                    if (aCancelled !== bCancelled) {
+                        return aCancelled - bCancelled;
+                    }
+
                     const priceA = parsePriceValue(a.floor?.price ?? a.floor?.meta?.price ?? '');
                     const priceB = parsePriceValue(b.floor?.price ?? b.floor?.meta?.price ?? '');
                     if (priceA === priceB) {
